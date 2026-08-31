@@ -8,7 +8,8 @@ Read this file first when resuming work. Update it at the end of every session.
 - Lean namespace: `Lax58`
 - Proof namespace: `Lax58Proofs`
 - Title: `Canonical encodings of finite data`
-- Current phase: public concepts compile; Lax validation and user review remain
+- Current phase: public concepts pass Lax validation and await user review;
+  proof work must not begin before approval
 
 ## Intended result
 
@@ -33,10 +34,13 @@ Registration remains user-only.
 ## 2026-08-31 checkpoint
 
 - Reserved `lax-58` and initialized a standalone Git repository.
-- Added four concept modules: canonical prefix codecs, primitive codecs,
-  compositional codecs, and canonical finite-set codecs.
+- Added eight focused concept modules: the core codec definition, canonical
+  decoding, computable maps, primitive codecs, raw combinators, lawfulness and
+  effectiveness closure, and canonical finite-set codecs.
 - The standard bit encoding of a natural `n` has exact length
   `2 * n.bits.length + 1`.
-- `lake build` passes for all concept modules without warnings.
-- No proof work has begun; after Lax concept validation, present the concepts
-  to the user and wait for approval.
+- Both `lake build` and `lax build . --only concepts --no-color` pass without
+  warnings. A full build reports `8 concepts · 0 proofs`.
+- The live preview was verified at `http://localhost:8123/lax-58/index.html`.
+- No proof work has begun; present the concepts to the user and wait for
+  approval.

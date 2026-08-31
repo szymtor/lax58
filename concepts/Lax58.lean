@@ -1,4 +1,8 @@
 import Lax58.CanonicalCodec
+import Lax58.CanonicalDecoding
+import Lax58.ComputableMaps
 import Lax58.PrimitiveCodecs
 import Lax58.CodecCombinators
+import Lax58.LawfulCombinators
+import Lax58.EffectiveCombinators
 import Lax58.FiniteCollections

@@ -80,12 +80,16 @@ def natCodec : Codec Nat where
   parse := parseNat
   size := natSize
 
-axiom unitCodec_lawful : unitCodec.Lawful
-axiom boolCodec_lawful : boolCodec.Lawful
-axiom natCodec_lawful : natCodec.Lawful
+/-- The primitive codecs satisfy all canonicality, exact-size, and
+computability requirements. -/
+structure PrimitiveCodecsValid : Prop where
+  unit_lawful : unitCodec.Lawful
+  bool_lawful : boolCodec.Lawful
+  nat_lawful : natCodec.Lawful
+  unit_effective : unitCodec.Effective
+  bool_effective : boolCodec.Effective
+  nat_effective : natCodec.Effective
 
-axiom unitCodec_effective : unitCodec.Effective
-axiom boolCodec_effective : boolCodec.Effective
-axiom natCodec_effective : natCodec.Effective
+axiom primitiveCodecs_valid : PrimitiveCodecsValid
 
 end Lax58.PrimitiveCodecs
