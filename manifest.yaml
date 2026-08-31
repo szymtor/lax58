@@ -1,0 +1,10 @@
+specVersion: "1"
+id: lax-58
+leanVersion: "v4.30.0"
+mathlibVersion: "c5ea00351c28e24afc9f0f84379aa41082b1188f"
+title: "Canonical encodings of finite data"
+authors:
+  - name: "Szymon Toruńczyk"
+    github: "szymtor"
+  - name: "Codex 5.6"
+bibEntries: []
