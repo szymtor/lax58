@@ -3,21 +3,21 @@ import Mathlib.Computability.Primrec.List
 
 /-!
 ---
-title: Canonical prefix codecs
+title: Prefix codecs for finite data
 type: definition
 ---
 
 A codec represents values by finite bit strings. Its parser reads one value
 from the beginning of a string and returns the unused suffix. A lawful codec
-has three properties: parsing an encoding in front of an arbitrary suffix
-recovers both the value and that suffix; every successful parse consumes
-exactly the canonical encoding of its result; and the encoding length equals
-the declared structural bit size.
+parses every value produced by its encoder in front of an arbitrary suffix,
+and its encoding length equals its declared structural bit size. A canonical
+codec additionally accepts only the distinguished encoding of each value.
 
-Full decoding accepts precisely complete canonical encodings. Computability
-of a map between presented types means that one computable operation on bit
-strings transforms every canonical input encoding into the canonical encoding
-of its image. Nothing is required on malformed input strings.
+This distinction permits ordinary serialization formats, whose decoders may
+accept several representations of one value, as well as canonical formats.
+Computability of a map between presented types means that one computable
+operation on bit strings transforms the distinguished input encoding into the
+distinguished encoding of its image. Nothing is required on malformed input.
 -/
 
 namespace Lax58.CanonicalCodec
@@ -41,15 +41,19 @@ def decode {α : Type u} (C : Codec α) (input : BitString) : Option α :=
   | some (x, []) => some x
   | _ => none
 
-/-- Correctness, canonicality, and the exact size law for a codec. -/
+/-- Round-trip correctness and the exact size law for a codec. -/
 structure Lawful {α : Type u} (C : Codec α) : Prop where
   parse_encode_append :
     ∀ (x : α) (suffix : BitString),
       C.parse (C.encode x ++ suffix) = some (x, suffix)
+  encode_length : ∀ x : α, (C.encode x).length = C.size x
+
+/-- A lawful codec is canonical if every successful parse consumes exactly
+the distinguished encoding of the returned value. -/
+structure Canonical {α : Type u} (C : Codec α) : Prop extends Lawful C where
   parse_canonical :
     ∀ {input : BitString} {x : α} {suffix : BitString},
       C.parse input = some (x, suffix) → input = C.encode x ++ suffix
-  encode_length : ∀ x : α, (C.encode x).length = C.size x
 
 /-- The encoder, parser, and size function are computable with respect to a
 chosen `Primcodable` presentation of the value type. -/
@@ -57,7 +61,7 @@ def Effective {α : Type u} [Primcodable α] (C : Codec α) : Prop :=
   Computable C.encode ∧ Computable C.parse ∧ Computable C.size
 
 /-- A string program computes `f` through codecs `C` and `D` when it maps
-every canonical encoding of `x` to the canonical encoding of `f x`. -/
+the distinguished encoding of `x` to the distinguished encoding of `f x`. -/
 def ComputableMap {α : Type u} {β : Type v} (C : Codec α) (D : Codec β)
     (f : α → β) : Prop :=
   ∃ program : BitString → Option BitString,

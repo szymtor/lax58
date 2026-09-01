@@ -7,40 +7,45 @@ Read this file first when resuming work. Update it at the end of every session.
 - Lax id: `lax-58`
 - Lean namespace: `Lax58`
 - Proof namespace: `Lax58Proofs`
-- Title: `Canonical encodings of finite data`
-- Current phase: public concepts pass Lax validation and await user review;
-  proof work must not begin before approval
+- Title: `Structural encodings of finite data`
+- Authors: Szymon Toruńczyk and Codex 5.6
+- Current phase: implementation, proofs, replay validation, and preview
+  verification complete
 
-## Intended result
+## Implemented result
 
-Provide a reusable, canonical and effective encoding standard for finitary
-data built from natural numbers, finite sums and products, lists, finite sets,
-and finite functions. Encoders produce strings over a fixed finite alphabet;
-decoders accept exactly canonical encodings; prefix parsing composes; and
-encoding length is controlled by a structural bit-size measure.
+The submission provides a reusable encoding layer for finite data:
 
-The standard should support concise `Primcodable` presentations of ranked
-alphabets, finite relational signatures, automata, tree automata, and syntax
-trees without exposing application-specific token grammars.
+- prefix codecs over bit strings, with separate lawfulness, canonicality, and
+  effectiveness properties;
+- exact structural bit-size functions;
+- canonical primitive codecs for `Unit`, `Bool`, `Nat`, and `Int`;
+- codec constructors for equivalences, products, sums, options, lists,
+  fixed-length vectors, functions on `Fin n`, and finite indices;
+- sorted canonical encoders with permutation-insensitive decoders for
+  multisets and repetition-insensitive decoders for finite sets;
+- a universal recursive representation by binary trees with natural leaves,
+  together with presentations for arrays, subtypes, collections, and the
+  standard finitary constructors;
+- a generic `Primcodable` codec as a qualitative fallback; and
+- computable realization of ordinary computable maps on distinguished bit
+  encodings.
 
-## Workflow
+The proof package establishes all eight public proof obligations. In
+particular, effectiveness of the list parser is proved through a terminating
+partial-recursive fixed point rather than assumed.
 
-1. Complete and validate concept files only.
-2. Present the concepts to the user for semantic review.
-3. Begin proofs only after approval.
+## Validation checkpoint (2026-09-01)
 
-Registration remains user-only.
+- `lake build` succeeds for the complete proof package.
+- `lax build . --no-color` succeeds with `11 concepts · 8 proofs`.
+- `lax build . --replay --no-color` succeeds, including kernel replay and
+  axiom-hygiene inspection.
+- Every public statement currently has a proof annotation in
+  `Lax58Proofs`.
+- The refreshed live preview at `http://localhost:8124/lax-58/index.html`
+  displays all eight statements as proven and no longer reports a stale local
+  archive database. Port 8123 was occupied when the final preview server was
+  started, so Lax selected port 8124.
 
-## 2026-08-31 checkpoint
-
-- Reserved `lax-58` and initialized a standalone Git repository.
-- Added eight focused concept modules: the core codec definition, canonical
-  decoding, computable maps, primitive codecs, raw combinators, lawfulness and
-  effectiveness closure, and canonical finite-set codecs.
-- The standard bit encoding of a natural `n` has exact length
-  `2 * n.bits.length + 1`.
-- Both `lake build` and `lax build . --only concepts --no-color` pass without
-  warnings. A full build reports `8 concepts · 0 proofs`.
-- The live preview was verified at `http://localhost:8123/lax-58/index.html`.
-- No proof work has begun; present the concepts to the user and wait for
-  approval.
+Registration remains a user-only action.

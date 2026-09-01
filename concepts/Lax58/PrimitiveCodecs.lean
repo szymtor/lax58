@@ -1,4 +1,3 @@
-import Mathlib.Data.Nat.Bits
 import Lax58.CanonicalCodec
 
 /-!
@@ -27,6 +26,17 @@ def bitsToNat : BitString → Nat
   | [] => 0
   | b :: bits => (if b then 1 else 0) + 2 * bitsToNat bits
 
+/-- Increment a least-significant-bit-first binary digit string. -/
+def incrementBits : BitString → BitString
+  | [] => [true]
+  | false :: bits => true :: bits
+  | true :: bits => false :: incrementBits bits
+
+/-- Canonical least-significant-bit-first binary digits of a natural number. -/
+def binaryBits : Nat → BitString
+  | 0 => []
+  | n + 1 => incrementBits (binaryBits n)
+
 /-- Split off and count the initial zero bits. -/
 def splitZeros : BitString → Nat × BitString
   | false :: bits =>
@@ -35,19 +45,18 @@ def splitZeros : BitString → Nat × BitString
   | bits => (0, bits)
 
 /-- Take exactly `n` bits, failing if the input is too short. -/
-def takeExact : Nat → BitString → Option (BitString × BitString)
-  | 0, bits => some ([], bits)
-  | _ + 1, [] => none
-  | n + 1, b :: bits => do
-      let (taken, suffix) ← takeExact n bits
-      pure (b :: taken, suffix)
+def takeExact (n : Nat) (bits : BitString) : Option (BitString × BitString) :=
+  if n ≤ bits.length then
+    some (bits.take n, bits.drop n)
+  else
+    none
 
 /-- The canonical self-delimiting binary representation of a natural number. -/
 def encodeNat (n : Nat) : BitString :=
-  List.replicate n.bits.length false ++ true :: n.bits
+  List.replicate (binaryBits n).length false ++ true :: binaryBits n
 
 /-- The exact bit length of the canonical natural-number encoding. -/
-def natSize (n : Nat) : Nat := 2 * n.bits.length + 1
+def natSize (n : Nat) : Nat := 2 * (binaryBits n).length + 1
 
 /-- Parse one canonical natural number from the front of a bit string. -/
 def parseNat (input : BitString) : Option (Nat × BitString) := do
@@ -86,6 +95,9 @@ structure PrimitiveCodecsValid : Prop where
   unit_lawful : unitCodec.Lawful
   bool_lawful : boolCodec.Lawful
   nat_lawful : natCodec.Lawful
+  unit_canonical : unitCodec.Canonical
+  bool_canonical : boolCodec.Canonical
+  nat_canonical : natCodec.Canonical
   unit_effective : unitCodec.Effective
   bool_effective : boolCodec.Effective
   nat_effective : natCodec.Effective

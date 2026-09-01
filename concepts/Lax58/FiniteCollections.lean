@@ -3,15 +3,16 @@ import Lax58.CodecCombinators
 
 /-!
 ---
-title: Canonical codecs for finite sets
+title: Codecs for finite multisets and sets
 type: definition
 ---
 
-A finite set over a linearly ordered type is encoded as the canonical list of
-its elements in increasing order. Decoding checks both sortedness and absence
-of duplicates before constructing the set. Consequently the representation is
-independent of the internal order used by `Finset`, is canonical, and has the
-same exact structural size as the corresponding list encoding.
+A finite multiset or set over a linearly ordered type is encoded by sorting its
+elements and applying the list codec. Decoding is deliberately permissive: it
+accepts every list order, and finite-set decoding also ignores repetitions.
+Thus these codecs round-trip and have a distinguished encoding, but are not
+claimed to be canonical. Applications needing a unique accepted representation
+should use an explicitly ordered list.
 -/
 
 namespace Lax58.FiniteCollections
@@ -22,19 +23,30 @@ open Lax58.CodecCombinators
 
 universe u
 
-/-- Increasing-list codec for finite sets. -/
+/-- List codec for finite multisets, with a sorted distinguished encoding. -/
+def multisetCodec {α : Type u} [LinearOrder α] (C : Codec α) : Codec (Multiset α) where
+  encode s := (listCodec C).encode (s.sort (· ≤ ·))
+  parse input := do
+    let (xs, suffix) ← (listCodec C).parse input
+    pure (xs, suffix)
+  size s := (listCodec C).size (s.sort (· ≤ ·))
+
+/-- List codec for finite sets, with a sorted distinguished encoding. The
+decoder accepts arbitrary order and ignores repeated elements. -/
 def finsetCodec {α : Type u} [LinearOrder α] (C : Codec α) : Codec (Finset α) where
   encode s := (listCodec C).encode (s.sort (· ≤ ·))
   parse input := do
     let (xs, suffix) ← (listCodec C).parse input
-    if xs.Pairwise (· ≤ ·) ∧ xs.Nodup then
-      pure (xs.toFinset, suffix)
-    else
-      none
+    pure (xs.toFinset, suffix)
   size s := (listCodec C).size (s.sort (· ≤ ·))
 
-axiom finsetCodec_lawful {α : Type u} [LinearOrder α]
-    (C : Codec α) (hC : C.Lawful) :
-  (finsetCodec C).Lawful
+/-- Both unordered-collection codecs preserve round-trip correctness. -/
+structure CollectionCodecsLawful : Prop where
+  multiset {α : Type u} [LinearOrder α] (C : Codec α) (hC : C.Lawful) :
+    (multisetCodec C).Lawful
+  finset {α : Type u} [LinearOrder α] (C : Codec α) (hC : C.Lawful) :
+    (finsetCodec C).Lawful
+
+axiom collectionCodecs_lawful : CollectionCodecsLawful
 
 end Lax58.FiniteCollections

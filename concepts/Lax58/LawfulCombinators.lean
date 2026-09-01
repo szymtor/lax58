@@ -2,13 +2,14 @@ import Lax58.CodecCombinators
 
 /-!
 ---
-title: Canonicality of codec combinators
+title: Correctness of codec combinators
 type: theorem
 ---
 
 Transport along an equivalence and the standard product, sum, option, list,
 fixed-vector, finite-function, and finite-index codec constructions preserve
-canonical prefix parsing and exact structural bit size.
+round-trip correctness and exact structural bit size. They also preserve the
+optional stronger property of canonical parsing.
 -/
 
 namespace Lax58.LawfulCombinators
@@ -36,6 +37,21 @@ structure Closure : Prop where
   finFunction {α : Type u} (C : Codec α) (n : Nat) :
     C.Lawful → (finFunctionCodec C n).Lawful
   fin (n : Nat) : (finCodec n).Lawful
+  canonical_equiv {α : Type u} {β : Type v} (e : α ≃ β) (C : Codec β) :
+    C.Canonical → (equivCodec e C).Canonical
+  canonical_prod {α : Type u} {β : Type v} (A : Codec α) (B : Codec β) :
+    A.Canonical → B.Canonical → (prodCodec A B).Canonical
+  canonical_sum {α : Type u} {β : Type v} (A : Codec α) (B : Codec β) :
+    A.Canonical → B.Canonical → (sumCodec A B).Canonical
+  canonical_option {α : Type u} (C : Codec α) :
+    C.Canonical → (optionCodec C).Canonical
+  canonical_list {α : Type u} (C : Codec α) :
+    C.Canonical → (listCodec C).Canonical
+  canonical_vector {α : Type u} (C : Codec α) (n : Nat) :
+    C.Canonical → (vectorCodec C n).Canonical
+  canonical_finFunction {α : Type u} (C : Codec α) (n : Nat) :
+    C.Canonical → (finFunctionCodec C n).Canonical
+  canonical_fin (n : Nat) : (finCodec n).Canonical
 
 axiom closure : Closure
 
