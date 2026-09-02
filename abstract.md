@@ -1,11 +1,14 @@
-We define a compositional standard for encoding finitary data as bit strings.
-A codec consists of an encoder, a prefix parser, and a structural bit-size
-measure. Lawful codecs round-trip their distinguished encodings and have
-encoding length equal to the declared size; canonicality, meaning that no
-alternative encodings are accepted, is an optional stronger property. We give
-standard codecs for primitive data, products, sums, options, lists, finite
-indices, vectors, finite functions, multisets, and finite sets. A universal
-structural representation supports concise presentations of recursive data,
-while a generic `Primcodable` adapter supplies a qualitative fallback. The
-interface connects these representations with computability on strings and
-lets later formalizations avoid application-specific token grammars.
+We define a neutral structural input convention for finite constructor data.
+Values are represented by binary trees with natural-number leaves; structural
+size counts tree nodes while primitive payload magnitude is tracked
+separately. A small fixed vocabulary constructs presentations for the ordinary
+type formers needed by downstream applications. Datatype-specific
+structurality is certified by complete constructor equations, preventing a
+representation from attaching derived advice or hidden preprocessing.
+
+Every structural value has a distinguished dense immutable word arena. The
+arena stores exactly three words per structural node plus one supplied root
+address, faithfully represents its source, and fits in fixed-width word memory
+under separate payload and address-space hypotheses. The submission does not
+provide binary serialization, mutable-heap semantics, operation costs, or an
+algorithmic runtime model.

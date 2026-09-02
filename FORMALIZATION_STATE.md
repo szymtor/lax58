@@ -7,45 +7,63 @@ Read this file first when resuming work. Update it at the end of every session.
 - Lax id: `lax-58`
 - Lean namespace: `Lax58`
 - Proof namespace: `Lax58Proofs`
-- Title: `Structural encodings of finite data`
+- Title: `Certified structural representations of finite data`
 - Authors: Szymon Toruńczyk and Codex 5.6
-- Current phase: implementation, proofs, replay validation, and preview
-  verification complete
+- Current phase: revised concepts and proofs complete locally; fresh full Lax
+  build passes; awaiting user review
 
-## Implemented result
+## Current architecture (2026-09-02)
 
-The submission provides a reusable encoding layer for finite data:
+Lax-58 now has exactly three concept modules:
 
-- prefix codecs over bit strings, with separate lawfulness, canonicality, and
-  effectiveness properties;
-- exact structural bit-size functions;
-- canonical primitive codecs for `Unit`, `Bool`, `Nat`, and `Int`;
-- codec constructors for equivalences, products, sums, options, lists,
-  fixed-length vectors, functions on `Fin n`, and finite indices;
-- sorted canonical encoders with permutation-insensitive decoders for
-  multisets and repetition-insensitive decoders for finite sets;
-- a universal recursive representation by binary trees with natural leaves,
-  together with presentations for arrays, subtypes, collections, and the
-  standard finitary constructors;
-- a generic `Primcodable` codec as a qualitative fallback; and
-- computable realization of ordinary computable maps on distinguished bit
-  encodings.
+- `StructuralPresentation`: the universal `Raw` type of natural leaves and
+  binary pairs, structural node count, maximum payload, `Presentation`,
+  round-trip lawfulness, faithfulness, structural size, and payload fit;
+- `StructuralCombinators`: the small fixed structural vocabulary needed by
+  Lax-53 (`Unit`, `Bool`, `Nat`, products, sums, lists, finite indices,
+  vectors, and ordered finite families), with grouped round-trip and exact
+  size laws;
+- `WordArena`: one distinguished dense immutable postorder arena for `Raw`,
+  with semantic representation, block validity, exact `3 * nodes` memory
+  footprint, exact `3 * nodes + 1` total footprint, and a payload/address
+  word-fit bridge.
 
-The proof package establishes all eight public proof obligations. In
-particular, effectiveness of the list parser is proved through a terminating
-partial-recursive fixed point rather than assumed.
+The generic binary serialization layer and `Presentation.Canonical` have been
+removed. The explicit arena encoder, rather than density alone, determines
+every stored word and rules out hidden annotations. Density independently
+rules out unreachable auxiliary blocks. Finite-function presentations certify
+content provenance only; no cheap-enumeration claim is made.
 
-## Validation checkpoint (2026-09-01)
+Datatype-specific constructor certificates belong to downstream submissions.
+Lax-53 now provides such certificates for automaton data, raw formulas, and
+ranked trees. The tree certificate uses a fixed constructor tag, exposes the
+symbol number as a `Nat` field, and recursively exposes the ordered children.
 
-- `lake build` succeeds for the complete proof package.
-- `lax build . --no-color` succeeds with `11 concepts · 8 proofs`.
-- `lax build . --replay --no-color` succeeds, including kernel replay and
-  axiom-hygiene inspection.
-- Every public statement currently has a proof annotation in
-  `Lax58Proofs`.
-- The refreshed live preview at `http://localhost:8124/lax-58/index.html`
-  displays all eight statements as proven and no longer reports a stale local
-  archive database. Port 8123 was occupied when the final preview server was
-  started, so Lax selected port 8124.
+## Proof and validation status
 
-Registration remains a user-only action.
+- `proofs/Lax58Proofs/StructuralCombinators.lean` proves all structural
+  combinator laws.
+- `proofs/Lax58Proofs/WordArena.lean` proves representation, well-formedness,
+  density, exact footprints, and word fit for the distinguished arena.
+- A fresh `lax build . --no-color` passes layout, dependency resolution,
+  concept compilation, proof compilation, and statement inspection
+  (`3 concepts · 12 proofs`).
+- The current organization deliberately uses multiple related statements in
+  each coherent concept, as confirmed by the Lax authors.
+- No `lax register` or publication action has been run.
+
+## Preservation and dependency notes
+
+- Preserve the untracked user artifacts `Archive.zip` and
+  `lax58_inmemory_patch/`; neither is submission content.
+- Lax-53 consumes this checkout through generated local Lake package
+  overrides. The installed Lax CLI still insists on an Archive content record
+  before honoring that local build setup, so a full Lax-53 `lax build` remains
+  blocked until the CLI behavior catches up or Lax-58 is submitted. Direct
+  `lake build` works locally and does not require publication.
+- Registration remains strictly user-only.
+
+## Exact next action
+
+Review the combined Lax-58/Lax-53 revision. Do not add serialization back to
+Lax-58 unless a distinct persistence/interchange use case is proposed.

@@ -1,8 +1,2 @@
-import Lax58Proofs.CanonicalDecoding
-import Lax58Proofs.ComputableMaps
-import Lax58Proofs.PrimitiveCodecs
-import Lax58Proofs.LawfulCombinators
-import Lax58Proofs.FiniteCollections
-import Lax58Proofs.StructuralEncodingLaws
-import Lax58Proofs.PrimcodableCodec
-import Lax58Proofs.EffectiveCombinators
+import Lax58Proofs.StructuralCombinators
+import Lax58Proofs.WordArena
