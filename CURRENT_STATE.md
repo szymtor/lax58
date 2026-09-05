@@ -1,6 +1,7 @@
 # Lax-58 current state
 
-Updated: 2026-09-05. Validated implementation prepared for Git publication.
+Updated: 2026-09-05. Implementation committed as `9439690` and publicly pushed
+to https://github.com/szymtor/lax58 (`main`).
 
 ## Implemented
 
@@ -70,8 +71,8 @@ finite family. Compiler/runtime refinements belong to Lax-53, not Lax-58.
 
 ## Constraints and next action
 
-The user has authorized a Git commit and public Git publication. The destination
-is awaiting confirmation because this repository has no configured remote.
+Public Git publication is complete at https://github.com/szymtor/lax58.
+`origin` is configured and `main` tracks `origin/main`.
 Lax submission and registration remain paused. The manifest lists Jan Dreier,
 Szymon Toruńczyk, and ChatGPT (5.6 and 6).
 

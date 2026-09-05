@@ -206,3 +206,12 @@ autonomously.
   tests, and workflow notes for a scoped commit. Excluded the unrelated
   `Archive.zip` and generated build artifacts; source credential-pattern and
   whitespace checks found no issues.
+
+## 2026-09-05 public Git publication
+
+- Committed the validated source as `9439690`.
+- After explicit confirmation, created the public repository
+  https://github.com/szymtor/lax58 and pushed `main`; `origin/main` tracking
+  is configured. The create-and-push command completed successfully.
+- `Archive.zip` remains local and untracked. Lax submission and registration
+  remain paused; no Lax publication command was run.
