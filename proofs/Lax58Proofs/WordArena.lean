@@ -355,6 +355,93 @@ private theorem encodeInto_root_lt (raw : Raw) (memory : WordMemory) :
   | nat payload => simp [encodeInto]
   | pair left right ihl ihr => simp [encodeInto]
 
+private theorem encodeInto_root_last (raw : Raw) (memory : WordMemory) :
+    (encodeInto raw memory).2 + 3 = (encodeInto raw memory).1.size := by
+  induction raw generalizing memory with
+  | nat payload => simp [encodeInto]
+  | pair left right ihl ihr => simp [encodeInto]
+
+/-- Every aligned pair block in a memory points strictly backward. -/
+private def BackwardPointers (memory : WordMemory) : Prop :=
+  ∀ parent,
+    parent % 3 = 0 →
+    parent + 2 < memory.size →
+    memory[parent]? = some WordImage.pairTag →
+    ∃ left right,
+      memory[parent + 1]? = some left ∧
+      memory[parent + 2]? = some right ∧
+      left < parent ∧ right < parent
+
+private theorem backwardPointers_pushBlock (memory : WordMemory) (tag x y : Nat)
+    (aligned : memory.size % 3 = 0) (old : BackwardPointers memory)
+    (newPointers : tag = WordImage.pairTag → x < memory.size ∧ y < memory.size) :
+    BackwardPointers (((memory.push tag).push x).push y) := by
+  intro parent parentAligned parentBound parentTag
+  let finalMemory := ((memory.push tag).push x).push y
+  have extension : Extends memory finalMemory :=
+    extends_trans (extends_trans (extends_push _ _) (extends_push _ _)) (extends_push _ _)
+  by_cases before : parent < memory.size
+  · have oldBound : parent + 2 < memory.size := by omega
+    have oldTag : memory[parent]? = some WordImage.pairTag := by
+      exact (extension.get_eq parent before).symm.trans parentTag
+    obtain ⟨left, right, leftRead, rightRead, leftLt, rightLt⟩ :=
+      old parent parentAligned oldBound oldTag
+    refine ⟨left, right, ?_, ?_, leftLt, rightLt⟩
+    · rw [extension.get_eq (parent + 1) (by omega)]
+      exact leftRead
+    · rw [extension.get_eq (parent + 2) oldBound]
+      exact rightRead
+  · have parentEq : parent = memory.size := by
+      simp only [Array.size_push] at parentBound
+      omega
+    subst parent
+    have tagEq : tag = WordImage.pairTag := by
+      exact Option.some.inj ((triple_get_zero memory tag x y).symm.trans parentTag)
+    obtain ⟨xLt, yLt⟩ := newPointers tagEq
+    exact ⟨x, y, triple_get_one memory tag x y, triple_get_two memory tag x y, xLt, yLt⟩
+
+private theorem encodeInto_backwardPointers (raw : Raw) (memory : WordMemory)
+    (aligned : memory.size % 3 = 0) (old : BackwardPointers memory) :
+    BackwardPointers (encodeInto raw memory).1 := by
+  induction raw generalizing memory with
+  | nat payload =>
+      apply backwardPointers_pushBlock memory WordImage.natTag payload 0 aligned old
+      intro impossible
+      simp [WordImage.natTag, WordImage.pairTag] at impossible
+  | pair left right ihl ihr =>
+      generalize hleft : encodeInto left memory = leftOut
+      obtain ⟨leftMemory, leftAddress⟩ := leftOut
+      generalize hright : encodeInto right leftMemory = rightOut
+      obtain ⟨rightMemory, rightAddress⟩ := rightOut
+      have leftSize := encodeInto_size left memory
+      rw [hleft] at leftSize
+      have rightSize := encodeInto_size right leftMemory
+      rw [hright] at rightSize
+      have leftAligned : leftMemory.size % 3 = 0 := by rw [leftSize]; omega
+      have rightAligned : rightMemory.size % 3 = 0 := by rw [rightSize]; omega
+      have leftBackward := ihl memory aligned old
+      rw [hleft] at leftBackward
+      have rightBackward := ihr leftMemory leftAligned leftBackward
+      rw [hright] at rightBackward
+      have leftRootLt := encodeInto_root_lt left memory
+      rw [hleft] at leftRootLt
+      have rightRootLt := encodeInto_root_lt right leftMemory
+      rw [hright] at rightRootLt
+      simp only [encodeInto, hleft, hright]
+      apply backwardPointers_pushBlock rightMemory WordImage.pairTag
+        leftAddress rightAddress rightAligned rightBackward
+      intro _
+      have leftAddressBeforeLeftEnd : leftAddress < leftMemory.size :=
+        Nat.lt_of_le_of_lt (Nat.le_add_right _ _) leftRootLt
+      have leftToRight := encodeInto_extends right leftMemory
+      rw [hright] at leftToRight
+      have leftMemoryBeforeRightEnd : leftMemory.size ≤ rightMemory.size := leftToRight.size_le
+      have rightAddressBeforeRightEnd : rightAddress < rightMemory.size :=
+        Nat.lt_of_le_of_lt (Nat.le_add_right _ _) rightRootLt
+      constructor
+      · exact Nat.lt_of_lt_of_le leftAddressBeforeLeftEnd leftMemoryBeforeRightEnd
+      · exact rightAddressBeforeRightEnd
+
 private def AllLt (memory : WordMemory) (bound : Nat) : Prop :=
   ∀ x ∈ memory.toList, x < bound
 
@@ -425,7 +512,7 @@ private theorem encodeRaw_fitsAux (raw : Raw) (w : Nat) :
     rw [encodeInto_size]
     simpa using space
   · intro x hx
-    simp only [WordImage.words, List.mem_cons] at hx
+    simp only [WordImage.toInput, List.mem_cons] at hx
     rcases hx with rfl | hx
     · change (encodeInto raw #[]).2 < 2 ^ w
       have rootLt := encodeInto_root_lt raw #[]
@@ -436,6 +523,104 @@ private theorem encodeRaw_fitsAux (raw : Raw) (w : Nat) :
       · exact all x hx
       · rw [encodeInto_size]
         simpa using space
+
+/-- Every word of the distinguished input is below any common strict payload
+and arena-capacity bound. This proof-facing form is useful when a downstream
+machine simulation needs an intermediate value bound rather than a power-of-two
+word bound. -/
+theorem encodeRaw_toInput_lt (raw : Raw) (bound : Nat)
+    (payloads : raw.maxNat < bound)
+    (space : 3 * raw.nodes ≤ bound) :
+    ∀ value ∈ (encodeRaw raw).toInput, value < bound := by
+  intro value hvalue
+  simp only [WordImage.toInput, List.mem_cons] at hvalue
+  rcases hvalue with rfl | hvalue
+  · change (encodeInto raw #[]).2 < bound
+    have rootLt := encodeInto_root_lt raw #[]
+    have sizeEq := encodeInto_size raw #[]
+    simp at rootLt sizeEq
+    omega
+  · have all := encodeInto_allLt raw #[] bound (by simp [AllLt]) payloads ?_
+    · exact all value hvalue
+    · rw [encodeInto_size]
+      simpa using space
+
+/-- The distinguished root is a valid aligned arena block. -/
+theorem encodeRaw_root_valid (raw : Raw) :
+    (encodeRaw raw).ValidAddress (encodeRaw raw).root :=
+  represents_valid (encodeRaw_representsAux raw)
+
+/-- The distinguished root address is aligned to its three-word block. -/
+theorem encodeRaw_root_aligned (raw : Raw) : (encodeRaw raw).root % 3 = 0 :=
+  (encodeRaw_root_valid raw).1
+
+/-- The distinguished root is the final block of the postorder arena. -/
+theorem encodeRaw_root_last (raw : Raw) :
+    (encodeRaw raw).root + 3 = (encodeRaw raw).memoryWords := by
+  simpa [encodeRaw, WordImage.memoryWords] using encodeInto_root_last raw #[]
+
+/-- A child reference records a valid parent block. -/
+theorem childAddress_parent_valid {I : WordImage} {parent child : Nat}
+    (h : I.ChildAddress parent child) : I.ValidAddress parent := by
+  cases h <;> assumption
+
+/-- Every child reference points to a valid block. -/
+theorem childAddress_child_valid {I : WordImage} {parent child : Nat}
+    (h : I.ChildAddress parent child) : I.ValidAddress child := by
+  cases h <;> assumption
+
+/-- Every child address is aligned to a three-word block. -/
+theorem childAddress_child_aligned {I : WordImage} {parent child : Nat}
+    (h : I.ChildAddress parent child) : child % 3 = 0 :=
+  (childAddress_child_valid h).1
+
+/-- Every pointer in the distinguished postorder arena points to an earlier block. -/
+theorem encodeRaw_childAddress_lt (raw : Raw) {parent child : Nat}
+    (h : (encodeRaw raw).ChildAddress parent child) : child < parent := by
+  have backward : BackwardPointers (encodeRaw raw).memory := by
+    simpa [encodeRaw] using encodeInto_backwardPointers raw #[] (by decide)
+      (by intro parent _ bound; simp at bound)
+  have parentValid := childAddress_parent_valid h
+  cases h with
+  | left _ _ tag reference =>
+      obtain ⟨left, right, leftRead, rightRead, leftLt, rightLt⟩ :=
+        backward parent parentValid.1 parentValid.2 (by
+          simpa [WordImage.wordAt?] using tag)
+      have childEq : child = left := Option.some.inj (by
+        simpa [WordImage.wordAt?] using reference.symm.trans leftRead)
+      simpa [childEq] using leftLt
+  | right _ _ tag reference =>
+      obtain ⟨left, right, leftRead, rightRead, leftLt, rightLt⟩ :=
+        backward parent parentValid.1 parentValid.2 (by
+          simpa [WordImage.wordAt?] using tag)
+      have childEq : child = right := Option.some.inj (by
+        simpa [WordImage.wordAt?] using reference.symm.trans rightRead)
+      simpa [childEq] using rightLt
+
+/-- A valid address is exactly three times its postorder block number. -/
+theorem validAddress_eq_three_mul_blockNumber {I : WordImage} {address : Nat}
+    (h : I.ValidAddress address) : 3 * (address / 3) = address := by
+  exact Nat.mul_div_cancel' (Nat.dvd_of_mod_eq_zero h.1)
+
+/-- The postorder block number of a valid block lies inside the arena. -/
+theorem validAddress_blockNumber_lt {I : WordImage} {address : Nat}
+    (h : I.ValidAddress address) : address / 3 < I.memoryWords / 3 := by
+  have addressEq := validAddress_eq_three_mul_blockNumber h
+  have nextBlockFits : 3 * (address / 3 + 1) ≤ I.memoryWords := by
+    calc
+      3 * (address / 3 + 1) = 3 * (address / 3) + 3 := by omega
+      _ = address + 3 := by rw [addressEq]
+      _ ≤ I.memoryWords := Nat.succ_le_of_lt h.2
+  have nextBlockNumberFits : address / 3 + 1 ≤ I.memoryWords / 3 :=
+    (Nat.le_div_iff_mul_le (by decide : 0 < 3)).2 (by
+      simpa [Nat.mul_comm] using nextBlockFits)
+  omega
+
+/-- The distinguished arena has one three-word block per structural node. -/
+theorem encodeRaw_blockCount (raw : Raw) :
+    (encodeRaw raw).memoryWords / 3 = raw.nodes := by
+  rw [encodeRaw_memoryWordsAux]
+  omega
 
 /--
 ---
@@ -484,6 +669,17 @@ theorem encodeRaw_totalWords_proof (raw : Raw) :
 
 /--
 ---
+conclusion: Lax58.WordArena.encodeRaw_toInput_length
+---
+-/
+theorem encodeRaw_toInput_length_proof (raw : Raw) :
+    (encodeRaw raw).toInput.length = 3 * raw.nodes + 1 := by
+  simp only [WordImage.toInput, List.length_cons, Array.length_toList]
+  rw [show (encodeRaw raw).memory.size = 3 * raw.nodes by
+    simpa [WordImage.memoryWords] using encodeRaw_memoryWordsAux raw]
+
+/--
+---
 conclusion: Lax58.WordArena.encodeRaw_fits
 ---
 -/
@@ -519,6 +715,18 @@ conclusion: Lax58.WordArena.encode_totalWords
 theorem encode_totalWords_proof {α : Type u} (P : Presentation α) (x : α) :
     (encode P x).totalWords = 3 * P.structuralSize x + 1 := by
   simp [encode, Presentation.structuralSize, WordImage.totalWords, encodeRaw_memoryWordsAux]
+
+/--
+---
+conclusion: Lax58.WordArena.encode_toInput_length
+---
+-/
+theorem encode_toInput_length_proof {α : Type u} (P : Presentation α) (x : α) :
+    (encode P x).toInput.length = 3 * P.structuralSize x + 1 := by
+  simp only [WordImage.toInput, List.length_cons, Array.length_toList]
+  rw [show (encode P x).memory.size = 3 * P.structuralSize x by
+    simpa [encode, Presentation.structuralSize, WordImage.memoryWords] using
+      encodeRaw_memoryWordsAux (P.toRaw x)]
 
 /--
 ---

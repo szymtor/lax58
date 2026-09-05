@@ -1,3 +1,7 @@
 import Lax58.StructuralPresentation
 import Lax58.StructuralCombinators
+import Lax58.StructuralDerivation
+import Lax58.CertifiedDerivation
+import Lax58.CertifiedDerivationElab
 import Lax58.WordArena
+import Lax58.FormulaExample

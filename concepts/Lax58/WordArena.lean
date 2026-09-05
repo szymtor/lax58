@@ -14,7 +14,8 @@ children. The root address is supplied as one additional word.
 The explicit encoder determines every stored word. Density separately says
 that it adds no unreachable auxiliary blocks. The semantic representation
 relation, exact footprint, and explicit payload and address-space hypotheses
-form the public interface. No whole-memory
+form the public interface. The distinguished Lax-13 input is the root word
+followed by the arena words on the machine's read-only input tape. No whole-memory
 decoder, uniqueness of arbitrary physical layouts, mutation semantics, or
 operation-cost model is imposed.
 -/
@@ -42,8 +43,8 @@ def memoryWords (I : WordImage) : Nat := I.memory.size
 /-- Total supplied words, including the separately supplied root. -/
 def totalWords (I : WordImage) : Nat := I.memoryWords + 1
 
-/-- The actual input word list, with the root followed by the arena array. -/
-def words (I : WordImage) : List Nat := I.root :: I.memory.toList
+/-- The distinguished Lax-13 input tape: root, followed by all arena words. -/
+def toInput (I : WordImage) : List Nat := I.root :: I.memory.toList
 
 /-- The memory array fits in the address space of `w`-bit words. -/
 def AddressSpaceFits (I : WordImage) (w : Nat) : Prop :=
@@ -51,7 +52,7 @@ def AddressSpaceFits (I : WordImage) (w : Nat) : Prop :=
 
 /-- Every supplied word, including the root, fits in `w` bits. -/
 def ValuesFitInWord (I : WordImage) (w : Nat) : Prop :=
-  ∀ x ∈ I.words, x < 2 ^ w
+  ∀ x ∈ I.toInput, x < 2 ^ w
 
 /-- Both the address space and all supplied word values fit at width `w`. -/
 def FitsInWord (I : WordImage) (w : Nat) : Prop :=
@@ -146,6 +147,12 @@ def encodeRaw (raw : Raw) : WordImage :=
 def encode {α : Type u} (P : Presentation α) (x : α) : WordImage :=
   encodeRaw (P.toRaw x)
 
+/-- An input word is exactly the distinguished arena input of the presented
+value; no extra prefix, suffix, or advice is permitted. -/
+def ArenaInput {α : Type u} (P : Presentation α) (x : α)
+    (input : List Nat) : Prop :=
+  input = (encode P x).toInput
+
 axiom encodeRaw_represents (raw : Raw) :
   (encodeRaw raw).Represents (encodeRaw raw).root raw
 
@@ -161,6 +168,9 @@ axiom encodeRaw_memoryWords (raw : Raw) :
 axiom encodeRaw_totalWords (raw : Raw) :
   (encodeRaw raw).totalWords = 3 * raw.nodes + 1
 
+axiom encodeRaw_toInput_length (raw : Raw) :
+  (encodeRaw raw).toInput.length = 3 * raw.nodes + 1
+
 axiom encodeRaw_fits (raw : Raw) (w : Nat) :
   raw.PayloadsFitInWord w →
   3 * raw.nodes ≤ 2 ^ w →
@@ -174,6 +184,9 @@ axiom encode_memoryWords {α : Type u} (P : Presentation α) (x : α) :
 
 axiom encode_totalWords {α : Type u} (P : Presentation α) (x : α) :
   (encode P x).totalWords = 3 * P.structuralSize x + 1
+
+axiom encode_toInput_length {α : Type u} (P : Presentation α) (x : α) :
+  (encode P x).toInput.length = 3 * P.structuralSize x + 1
 
 axiom encode_fits {α : Type u} (P : Presentation α) (x : α) (w : Nat) :
   P.PayloadsFitInWord x w →

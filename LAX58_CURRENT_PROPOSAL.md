@@ -119,11 +119,13 @@ structure TreePresentationLaws (P : Presentation (Tree A)) : Prop where
 
 Lax-58 supplies the fixed vocabulary and generic theorems used on the
 right-hand sides. Lax-53 supplies the equations specific to ranked trees and
-raw formulas.
+its intrinsic Lax-52 formulas.
 
-A future `deriving Structural` command should generate a presentation and the
-same equations that a human would prove manually. The kernel checks those
-equations, so automation introduces no additional mathematical trust.
+The current `structural%` and `structuralFun%` elaborators generate the
+constructor fold, including dependent finite families. The owning submission
+still states a first-class law group containing the equations a human would
+write and proves it by reduction. The kernel checks those equations, so the
+automation introduces no additional mathematical trust.
 
 ## 5. Keep the structural vocabulary small
 
@@ -140,9 +142,12 @@ Finite-family combinators certify provenance only. Since an arbitrary Lean
 function may be expensive to evaluate, the cost of enumerating a finite
 function remains a separate computation/refinement theorem.
 
-Concrete `Raw.nat` tags and `Raw.pair` nesting should be implemented inside
-these combinators. Downstream certificates should describe constructor
-structure rather than numerical tags or parser details.
+Concrete `Raw.nat` tags and `Raw.pair` nesting are implemented inside these
+combinators. `Raw.constructor` takes a symbolic string name and ordered fields;
+its injectivity law lets downstream certificates describe constructor
+structure without numerical tags or parser details. The string is only a
+human-readable constructor identifier: Lax-58 realizes it injectively as one
+internal natural payload, so it cannot carry value-dependent advice.
 
 Combinators such as multisets, finite sets, integers, subtypes, and optional
 values should be retained only when an immediate archive consumer needs them.
@@ -322,17 +327,31 @@ A practical organization is:
 StructuralPresentation       definitions of Raw and Presentation
 StructuralCombinators        fixed vocabulary and its related laws
 WordArena                    memory definitions, encoder, and related laws
+
+CertifiedDerivation          small field-agreement API (infrastructure)
+CertifiedDerivationElab      closed command and registry (elaboration infrastructure)
+StructuralDerivation         unrestricted folds (elaboration infrastructure)
 ```
 
-The website prose should present these pages as parts of one small structural
-representation construction.
+The first three pages are mathematical concepts. The remaining three are
+explicitly labeled infrastructure: agreement bookkeeping is not a standalone
+definition of advice-freedom, and the generator is not a mathematical object.
+Lax currently classifies every non-root concept-package module as a concept,
+so the tooling remains visible and auditable under that packaging constraint.
+No hidden helper directory or proof-package import is used to bypass it.
+
+The closed command still creates the encoder, complete constructor laws, and
+checked witness together. Its resolver never consumes arbitrary agreement
+values or unrestricted field encoders. Generated downstream laws are the
+human-reviewable semantic specification; the kernel checks their proofs.
 
 ## 13. Non-goals
 
 Lax-58 should not introduce:
 
 - a closed universe of all Lean datatype descriptions;
-- automatic derivation before manual Lax-53 examples stabilize the interface;
+- treating automatic derivation or `FieldEncoding` membership by itself as a
+  no-advice certificate;
 - mutable heaps or allocation semantics;
 - separation logic;
 - RAM instruction semantics;
@@ -343,8 +362,8 @@ These would obscure the central claim and belong in later infrastructure.
 
 ## 14. Proposed implementation order
 
-1. Specify the certificate equations needed for Lax-53 ranked trees and raw
-   formulas.
+1. Generate complete constructor certificates for Lax-53 ranked trees and
+   intrinsic formulas, recursively resolving only approved fields.
 2. Reduce and adjust the Lax-58 combinator vocabulary to express those
    equations without low-level tags.
 3. Remove binary serialization concepts and their proof obligations from

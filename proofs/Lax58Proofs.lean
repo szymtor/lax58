@@ -1,2 +1,3 @@
+import Lax58Proofs.StructuralPresentation
 import Lax58Proofs.StructuralCombinators
 import Lax58Proofs.WordArena

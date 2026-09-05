@@ -9,6 +9,12 @@ natural-number leaves. A presentation consists of a map into this shape and a
 partial inverse. Its structural size counts shape nodes, independently of any
 binary serialization or in-memory layout.
 
+`Presentation` is deliberately low-level infrastructure. An arbitrary
+presentation is not automatically a neutral complexity-theoretic input
+representation: its forward map could compute and attach derived advice.
+Advice-freedom is supplied downstream by complete, kernel-checked constructor
+equations built from the fixed structural vocabulary.
+
 Natural payload magnitude is recorded separately from structural size. This
 separation is useful for word-machine applications: a large natural leaf still
 occupies one structural node, but may require a wider machine word.
@@ -47,6 +53,17 @@ structure Presentation (α : Type u) where
   toRaw : α → Raw
   fromRaw : Raw → Option α
 
+/-- Package an injective structural map as a low-level presentation by
+choosing a preimage on its range. This construction certifies no complexity
+or constructor-structurality property of the supplied map. -/
+noncomputable def presentationOf {α : Type u} (f : α → Raw) : Presentation α := by
+  classical
+  exact {
+    toRaw := f
+    fromRaw := fun raw =>
+      if h : ∃ x, f x = raw then some (Classical.choose h) else none
+  }
+
 namespace Presentation
 
 /-- Distinguished representations round-trip. -/
@@ -56,15 +73,6 @@ def Lawful {α : Type u} (P : Presentation α) : Prop :=
 /-- Distinct values have distinct structural representations. -/
 def Faithful {α : Type u} (P : Presentation α) : Prop :=
   Function.Injective P.toRaw
-
-/-- A round-tripping presentation is faithful. -/
-theorem faithful_of_lawful {α : Type u} {P : Presentation α}
-    (hP : P.Lawful) : P.Faithful := by
-  intro x y hxy
-  have hx := hP x
-  have hy := hP y
-  rw [hxy, hy] at hx
-  exact (Option.some.inj hx).symm
 
 /-- Structural size before any serialization or memory layout is chosen. -/
 def structuralSize {α : Type u} (P : Presentation α) (x : α) : Nat :=
