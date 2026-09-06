@@ -85,6 +85,80 @@ one leaf. Word-width hypotheses must cover both payloads and addresses.
 Runtime costs, injectivity, and round-trip decoder proofs are separate
 obligations; this command does not automatically prove them.
 
+## Stating RAM complexity
+
+Import `Lax58.RamComplexityElab` and supply a mathematical function and two
+explicit resource bounds:
+
+```lean
+import Mathlib.Computability.Partrec
+import Lax58.RamComplexityElab
+
+def LinearInFirstInput (f : List Nat × List Nat → Nat) : Prop :=
+  ∃ timeCoefficient wordCoefficient : Nat → Nat,
+    Computable timeCoefficient ∧ Computable wordCoefficient ∧
+    RamComputableWithin f
+      (fun x => (x.1.length + 1) * timeCoefficient x.2.length)
+      (fun x => wordCoefficient x.2.length * inputMagnitude x)
+```
+
+This specifies one program with the indicated instruction bound at every
+sufficient word width. The third argument bounds required **word capacity**
+(`wordBound x ≤ 2 ^ w`), not the number of bits. Payloads and input addresses
+must also fit. `inputMagnitude x` is the selected representation's node count
+plus its largest natural payload plus one. Neither computability nor a growth
+restriction on the bounds is implicit; quantify coefficients as in this example.
+
+`timeCoefficient k` supplies the time multiplier when the second sequence has
+length `k`; `wordCoefficient k` supplies the sufficient-capacity multiplier.
+They are computable functions of that length alone, chosen once for the
+algorithm. The example concept also defines `PolynomialTimeOfDegree f d`
+using time `timeCoefficient * (n + 1)^d`, and `PolynomialTime f` by existentially
+quantifying `d`. Both retain `TimeBounded`'s constant-times-input-magnitude
+word-capacity convention; sequence length is the time measure, not bit length.
+
+The frontend selects approved encodings without consulting user instances.
+Inputs use arenas. `Nat` outputs are `[n]`, `Bool` outputs are `[0]` or `[1]`,
+and other supported outputs use arenas. Output production counts toward time.
+Registered constructor encoders can be composed with the fixed Nat/list/product
+vocabulary, proof-erased subtypes, and finite families. Unsupported types and
+genuinely dependent result types are rejected; bundle dependent data into a
+supported input datatype first.
+
+The expanded proposition is `Lax58.RamComplexity.RamComputableWithinUsing`,
+with both encodings explicit and inspectable. It is a low-level relative
+predicate, not itself an encoding certificate. See
+[RamComplexityExample](concepts/Lax58/RamComplexityExample.lean) for the
+two-input and ordinary size-based examples. This layer uses the existing
+Lax13 machine model, pinned to the same revision as Lax53.
+
+## Polynomial time measured in bits
+
+`Lax58.RamPolynomialComparison.BitPolynomialTime f` keeps arena input and
+one-word natural output, but bounds time and sufficient **word length in bits**
+by polynomials in `Lax51.BinaryWordEncoding.bitSize xs`. This size counts a
+separator per entry and the entry's binary digits. The underlying reusable
+`BitPolynomialTimeUsing` accepts an explicit presentation, output encoding,
+and size measure. It instantiates `RamComputableWithinUsing` with capacity
+`2 ^ wordBits.eval (inputSize x)` and requires the input to fit at that width.
+
+The concept includes `exponentialLength xs = 2 ^ xs.length`. Its positive
+bit-polynomial proof uses six RAM instructions and sufficient width
+`bitSize xs + 4`. Its negative proof rules out the existing linear-capacity
+`TimeBounded` property for **every** time allowance, hence also rules out
+`PolynomialTime`. Both proofs use only Lean's permitted background axioms.
+
+The general equivalence with Lax51's native, length-prefixed input convention
+is kernel-checked. Two verified RAM compilers translate the input tapes and
+simulate arbitrary programs with constant-factor instruction overhead,
+constant word-width slack, and linear startup work. The implications choose
+independent polynomial witnesses; their degrees need not agree. More exactly,
+arena-to-native translation maps time `T` to `66*T + 6*X + 81`, while
+native-to-arena maps it to `18*T + 26`; both map sufficient width `Q` to
+`Q + 7`. Hence degrees at least one are preserved, but a constant arena-time
+bound can become linear under the current adapter. See
+[RamPolynomialComparison](concepts/Lax58/RamPolynomialComparison.lean).
+
 Run `bash scripts/check-certified.sh` for the positive and negative derivation
 tests. See [CURRENT_STATE.md](CURRENT_STATE.md) for validation status and
 [WORKFLOW.md](WORKFLOW.md) for development rules.

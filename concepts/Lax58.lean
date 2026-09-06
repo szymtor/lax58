@@ -5,3 +5,8 @@ import Lax58.CertifiedDerivation
 import Lax58.CertifiedDerivationElab
 import Lax58.WordArena
 import Lax58.FormulaExample
+import Lax58.RamComplexity
+import Lax58.RamComplexityElab
+import Lax58.RamComplexityExample
+import Lax58.BitPolynomialTime
+import Lax58.RamPolynomialComparison

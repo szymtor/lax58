@@ -15,3 +15,9 @@ path = "../concepts"
 
 [[lean_lib]]
 name = "Lax58Proofs"
+
+[[require]]
+name = "Lax13"
+git = "https://github.com/lax-archive/lax-submissions"
+rev = "92ae2d6275d09b856c02d6f851755590fdcb30ed"
+subDir = "word-ram/concepts"

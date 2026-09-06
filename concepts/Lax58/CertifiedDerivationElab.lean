@@ -72,6 +72,11 @@ private partial def certifiedField (type : Expr) : TermElabM Expr := do
     saved.restore
   throwError "unsupported certified field type {type}; expected Nat, Fin, a proof-erased subtype, a finite family, or an earlier constructor-certified datatype"
 
+/-- Read-only access to the closed field resolver for other elaborators.
+This does not register encoders or consume caller-supplied agreement values. -/
+def resolveCertifiedField (type : Expr) : TermElabM Expr :=
+  certifiedField type
+
 private def recursiveType (indName : Name) (type : Expr) : TermElabM Bool := do
   return (← whnf type).getAppFn.constName? == some indName
 

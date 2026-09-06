@@ -1,8 +1,9 @@
 # Lax-58 development workflow
 
 Read [CURRENT_STATE.md](CURRENT_STATE.md) first. This package owns structural
-content provenance and the distinguished immutable arena, not automata,
-mutable compiler storage, or machine cost models.
+content provenance, the distinguished immutable arena, and an encoding-aware
+resource predicate over the existing Lax13 RAM model. It does not own automata,
+mutable compiler storage, or a new machine cost model.
 
 Keep agreement definitions in `CertifiedDerivation` free of elaborator code;
 constructor inspection and the private registry belong to
@@ -24,6 +25,13 @@ do not hide the tooling in an undeclared directory or import it from proofs.
    an explicit explanation. Privacy is not a kernel trust boundary.
 
 ## Validation tiers
+
+`RamComplexityElab` is a read-only client of the closed derivation registry.
+Keep its Nat/list/product, subtype, and finite-family rules explicit. Never
+replace them with an unrestricted presentation instance search. The same
+resolver must select input encodings for the predicate and `inputMagnitude`.
+Test exact expanded propositions, fixed output conventions, imported registry
+entries, and rejection of unregistered inputs and outputs after each change.
 
 From this repository root:
 

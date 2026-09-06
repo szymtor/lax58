@@ -215,3 +215,154 @@ autonomously.
   is configured. The create-and-push command completed successfully.
 - `Archive.zip` remains local and untracked. Lax submission and registration
   remain paused; no Lax publication command was run.
+
+## 2026-09-05 successful Lax draft submission
+
+- User authorized submitting Lax58. The first command added the required
+  issue binding to `manifest.yaml`; committed and pushed it as `53278a4`.
+- Retried `lax submit . --allow-dirty --no-color`, excluding only the local
+  untracked `Archive.zip`. Session `89909` completed successfully: local build
+  33s, Archive rebuild 2m05s, public-record publication 36s.
+- Workflow `33964638553` published commit
+  `53278a48b0605bde8cfc9510066ee797d085a6f1` as the Lax58 draft at
+  https://laxarchive.org/lax-58/. Archive commit:
+  `ebdab5038116a53393dc56dbfde44ba2f3c6e82c`.
+- Drafted the requested message to Jan in the conversation; did not send it.
+  No registration was performed. Lax53 submission is now separately requested.
+
+## 2026-09-06 explicit RAM resource bounds and closed encoding selection
+
+- Implemented the user-approved `RamComputableWithin f timeBound wordBound`
+  frontend and its encoding-explicit `RamComputableWithinUsing` definition.
+  Word capacity remains explicit; the earlier hidden parameter/coefficient
+  proposal was not implemented. The two example properties quantify their
+  coefficients directly. Both bounds are functions of the whole typed input.
+- Added `RamComplexity`, `RamComplexityElab`, and `RamComplexityExample` to
+  the concept root. The elaborator is a read-only client of the original
+  closed field resolver/registry. Fixed list/product composition uses the
+  exact existing presentations; subtype and finite-family composition keeps
+  proofs erased and intrinsic order. No arbitrary presentation instances or
+  hand-built agreement records are consumed. Nat/Bool outputs use one word;
+  other supported outputs use arenas.
+- Added `inputMagnitude` through the same input resolver and updated README,
+  abstract, and workflow to describe the new layer over Lax13. Added the
+  Lax13 pin already used by Lax53, without changing other dependency pins.
+- Regression-driven fixes preserve exact list/product encoding expansions
+  and postpone selection until binder-local type constraints are resolved.
+  Indexed-encoder tests use the existing command's supported implicit-index
+  syntax. The choice-based decoder wrapper is not claimed executable.
+- `bash scripts/check-certified.sh` passes in session `67976` (814 build
+  jobs): previous certification suites plus expanded proposition/quantifier
+  checks, primitive/structured outputs, imported and indexed registrations,
+  dependent families, subtypes, ignored malicious field instances, rejected
+  unregistered input/output types, dependent result rejection, malformed
+  bounds, and background-axiom audit.
+- Full `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` passes in
+  session `63434` (1m19s): 10 concepts, 15 proofs, independent kernel replay.
+  The only warning is Lax13's supersession by Lax67. Earlier validation runs
+  exposed missing network access for dependency provisioning; the approved
+  retry fetched the pinned dependency. Final whitespace checks pass.
+- Discussed why input length alone is not a universal word-capacity bound:
+  input payload fit is separate, and intermediate values/addresses may exceed
+  input length. No semantic change was inferred from that question.
+- Changes remain local and uncommitted. No Lax53 files, existing structural
+  encoders, publication state, registration, or unrelated `Archive.zip` were
+  changed. The generated local preview data now includes the new concepts.
+
+## 2026-09-06 descriptive coefficients, polynomial examples, and Lax51 comparison
+
+- Renamed `g`/`h` to `timeCoefficient`/`wordCoefficient`, documenting how both
+  depend only on the second input's length. Also named `timeByLength` and the
+  constant `wordCoefficient` in the one-input example; synchronized README.
+- Added `PolynomialTimeOfDegree f d`, with time at most a constant times
+  `(n + 1)^d`, and `PolynomialTime f := ∃ d, PolynomialTimeOfDegree f d`.
+  Both reuse the existing `TimeBounded` word-capacity convention. Degree zero
+  is allowed and the degree is an upper bound, not an optimality claim.
+- Full build and independent replay passed in session `46904` (1m41s,
+  10 concepts, 15 proofs). Updated regression file passed in session `98595`;
+  the earlier suite `76784` found only an overestimated expected axiom set in
+  the new audit, corrected from `[propext, Quot.sound]` to `[propext]`.
+  Added exact-expansion, existential-degree, and zero-degree checks.
+- User asked whether this coincides with `Lax51.RamPolytime`, and requested a
+  proof if so. Read that definition and `BinaryWordEncoding`/`TuringPolytime`.
+  It does not coincide: Lax51 measures time and polynomial sufficient word
+  bit width in binary input size. The local example measures time in list
+  length and bounds sufficient capacity linearly in input magnitude. Its
+  input arena also differs from Lax51's length-prefixed native list.
+- Explained the separating output `2 ^ xs.length` (wrapped as a singleton
+  for Lax51): on zero lists its bit length is linear, but its numerical value
+  cannot fit at every linear-capacity width required by the local example.
+  No equivalence proof was asserted, no additional dependency was introduced,
+  and neither definition was changed in response to the comparison question.
+- User requested preview refresh; the successful full build regenerated local
+  preview data with the new names and polynomial definitions. All changes
+  remain local and uncommitted; no publication or registration was performed.
+
+## 2026-09-06 explanatory comparison PDF
+
+- At the user's request, rewrote the Lax51/Lax58 comparison as a two-page PDF
+  and editable LaTeX in `docs/ram-polynomial-time-comparison.{pdf,tex}`.
+- The comparison table defines input magnitude as structural node count plus
+  maximum payload plus one, and specializes it to `2n + m + 2` for lists.
+  Included the reason for using `m` rather than `log m`, quantifier/width
+  distinctions, and the `2 ^ length` separating example with numeric values.
+- Compiled with pdflatex, corrected a reserved macro-name conflict and a line
+  overflow, and visually inspected both rendered pages. Final compilation has
+  no overfull/underfull boxes or warnings. Build intermediates remain in the
+  task-specific temporary directory, outside the source tree.
+- No Lean definitions, proofs, package pins, manifest, or publication state
+  changed. The note explicitly distinguishes its mathematical explanation from
+  a kernel-checked separation theorem.
+
+## 2026-09-06 PDF notation layout
+
+- Replaced the second paragraph's inline notation definitions with four aligned
+  display lines for `n`, `m`, `B`, and `M = inputMagnitude(x)` as requested.
+- Regenerated the same PDF; it remains two pages. Inspected the updated first
+  page and checked the final LaTeX log: no warnings or overfull/underfull boxes.
+- No mathematical definitions or Lean files changed.
+
+## 2026-09-06 requested arena bit-polynomial equivalence: model conflict
+
+- User requested an additional notion aligned with Lax51, an equivalence
+  theorem, explanatory comments, and formal positive/negative results for the
+  separating example. User explicitly chose to keep certified arena input.
+- Inspected Lax51's clean local source and archive record (both at
+  `4f6c21aae81fbe8d1233d3ae8358b82b110549b9`), both lakefiles, RAM definitions,
+  existing TM/RAM input adapters, and proof code. Lax51 pins the older
+  accumulator RAM at `d35ba57ad420ce6a6d3c763aa7f6a4a8be1d406d`, whereas
+  Lax58 uses the cell-to-cell RAM at `92ae2d6275d09b856c02d6f851755590fdcb30ed`.
+  A source diff confirms different instruction types, state, and semantics
+  under the same `Lax13.Ram` module name; old proofs explicitly require `Op`
+  and `State.acc`. This is additional to arena/native conversion obligations.
+- No existing ready compatibility theorem was found in active Lax51/Lax53/
+  Lax58 sources. Did not silently repin either package, reinterpret Lax51,
+  add an unproved equivalence axiom, or claim the requested proofs complete.
+- Paused for authority to resolve the older Lax51 dependency/model before
+  implementing the cross-package equivalence. Existing validated files and
+  the explanatory PDF remain intact; Lax51 worktree is unchanged.
+
+## 2026-09-06 bit-polynomial definition and formal separation
+
+- Reattached to Lax51's already-authorized submission. The archive confirmed
+  successful publication of `6fe5a3d94f6c2da46cc2c5ab98cd36997b130737`;
+  synced and pinned its concept package in Lax58. The old model conflict is
+  resolved, without local source overrides or changed Lax51 statements.
+- Added the arena-based bit-polynomial definition and comparison concept.
+  The general equivalence is explicitly open; both exponential-example
+  statements have independent proofs that do not assume it.
+- Proved a generic RAM output-fit invariant, the negative result for every
+  time allowance under linear capacity, and a six-instruction positive
+  arena algorithm at sufficient width `bitSize xs + 4`.
+- Proved the generic capacity/bit-width reformulation. Full Lake proof root
+  and first regression/axiom audit passed; independent replay and guarded
+  regression rerun are the next validation steps.
+- Equivalence still needs actual tape adapters and composition safe against
+  arbitrary programs using scratch memory. No Lax58 commit or publication yet.
+- Guarded full regression suite passed (`63986`). Independent kernel replay
+  and statement inspection passed (`21080`, then `8159` after adding checked
+  even/odd virtual-memory lemmas): 12 concepts, 17 proofs. The open equivalence
+  remains deliberately unproved and is not used by either example proof.
+- Updated README and regenerated the two-page explanatory PDF with current
+  proof status; final LaTeX log is clean. Recorded the remaining streaming
+  adapter/compiler design in `RAM_EQUIVALENCE_PLAN.md`.

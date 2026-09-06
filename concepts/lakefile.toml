@@ -11,3 +11,15 @@ rev = "c5ea00351c28e24afc9f0f84379aa41082b1188f"
 
 [[lean_lib]]
 name = "Lax58"
+
+[[require]]
+name = "Lax13"
+git = "https://github.com/lax-archive/lax-submissions"
+rev = "92ae2d6275d09b856c02d6f851755590fdcb30ed"
+subDir = "word-ram/concepts"
+
+[[require]]
+name = "Lax51"
+git = "https://github.com/szymtor/RAM-TM"
+rev = "6fe5a3d94f6c2da46cc2c5ab98cd36997b130737"
+subDir = "concepts"

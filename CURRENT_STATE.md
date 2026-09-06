@@ -1,7 +1,128 @@
 # Lax-58 current state
 
-Updated: 2026-09-05. Implementation committed as `9439690` and publicly pushed
-to https://github.com/szymtor/lax58 (`main`).
+Updated: 2026-09-06. Public draft/source remain at `53278a4` on
+https://github.com/szymtor/lax58 (`main`). The RAM-complexity extension below
+is local and uncommitted; no new submission or registration has been made.
+
+## Local RAM-complexity extension
+
+- Added the mathematical concept `RamComplexity`: `RamComputableWithinUsing`
+  states one program, all inputs, all sufficient widths, with explicit time
+  and word-capacity bounds. There is no hidden parameter or coefficient.
+- Added `RamComplexityElab`: `RamComputableWithin f timeBound wordBound`
+  automatically selects approved encodings; `inputMagnitude x` uses the same
+  input resolver. It reuses a new read-only `resolveCertifiedField` wrapper
+  around the existing private resolver. No registry writes or arbitrary
+  witness/instance fallback were added.
+- Selection uses exact existing Nat/list/product presentations, proof-erased
+  subtypes, finite families, and registered constructor encoders. Nat/Bool
+  outputs are one word; other supported outputs use arenas. The choice-based
+  presentation wrapper for registered encoders does not claim an executable
+  decoder. Existing structural encoders and Lax53 statements are unchanged.
+- Added `RamComplexityExample` with `LinearInFirstInput`, `TimeBounded`,
+  `PolynomialTimeOfDegree`, and `PolynomialTime`, and documented usage in
+  README. These are properties, not algorithm claims. Coefficient names are
+  now `timeCoefficient` and `wordCoefficient`, with their roles documented.
+  Polynomial time is measured in list length and retains the constant-times-
+  input-magnitude capacity convention; it is not Lax51's bit-size notion.
+- Added the Lax13 concept dependency at
+  `92ae2d6275d09b856c02d6f851755590fdcb30ed`, matching Lax53's pin. This adds a
+  resource-predicate layer over the existing model, not a new machine model.
+- `bash scripts/check-certified.sh` passes (session `67976`, 814 build jobs),
+  including existing suites and new exact-expansion, imported/indexed encoder,
+  finite-family, subtype, malicious-override, unsupported-input/output, and
+  background-axiom checks. Full `lax build . --replay --no-color` passes
+  (session `63434`, 1m19s): 10 concepts, 15 proofs, independent kernel replay.
+  The only warning is that Lax13 is superseded by Lax67. The build refreshed
+  `build-output.json`; no new axioms or proof obligations were introduced.
+- The updated polynomial examples passed full build and independent replay
+  in session `46904` (1m41s, 10 concepts, 15 proofs). The extended RAM test file
+  passes in session `98595`, including the exact polynomial expansion, degree
+  zero, existential degree, and background-axiom checks. The full suite run
+  `76784` passed the old checks but initially rejected the new audit's expected
+  axiom list; corrected it to the actual smaller set (`propext` only).
+- Compared `RAM-TM-equivalence/concepts/Lax51/RamPolytime.lean` read-only:
+  Lax51 uses binary input size and polynomial sufficient bit width, with
+  length-prefixed native input. The example here uses list length and an
+  arena, with a linear-in-magnitude capacity threshold. For the singleton
+  output adapter, `f xs = 2 ^ xs.length` separates the conventions on zero
+  lists: polynomial output bit length is allowed by Lax51 but exceeds the
+  logarithmic-in-length sufficient widths required here. This is a mathematical
+  comparison initially had no formal separation proof. The extension below
+  now proves separation independently and adds the migrated Lax51 dependency;
+  the original convention has not been silently changed.
+- The user's input-length question does not change the implementation:
+  payload fit is a separate premise, while the explicit word bound can account
+  for intermediate values and addresses exceeding the input length.
+
+## Arena-based bit-polynomial extension (completed locally)
+
+The Lax51 model conflict is resolved: its migration to the current Lax13 was
+kernel-replayed, committed, pushed, and successfully submitted. `lax submit
+--resume` confirmed publication at `6fe5a3d94f6c2da46cc2c5ab98cd36997b130737`.
+Lax58 now pins that Lax51 concept package; `lax sync` and dependency resolution
+accepted it. No local replacement of an archive dependency is being used.
+
+Implemented:
+
+- `BitPolynomialTime.BitPolynomialTimeUsing`: explicit presentation/output/size,
+  polynomial time and sufficient bit width, instantiated through the existing
+  capacity predicate. It requires the arena to fit at the sufficient width.
+- `RamPolynomialComparison.BitPolynomialTime`: natural-list input with the
+  same binary size as Lax51, arena input, and one-word natural output.
+- The comparison concept states the general equivalence and both halves of
+  the `exponentialLength xs = 2 ^ xs.length` separation. Comments explain
+  the different size and width conventions.
+- `RamOutputBounds`: all exact output words fit, for every program/run.
+- `RamPolynomialSeparation`: the exponential example fails `TimeBounded`
+  for every time allowance, and therefore fails `PolynomialTime`.
+- `RamExponentialExample`: the example satisfies the new bit-polynomial
+  definition, using six executed RAM instructions and width `bitSize xs + 4`.
+- `BitPolynomialTime.using_iff`: proved conversion between the capacity-form
+  API and the usual quantification over every sufficiently large bit width.
+- New regression tests check actual runs (including empty input), both
+  theorem endpoints, and exact background-axiom sets.
+- `RamVirtualMemory`, `RamVirtualCompiler`, and `RamVirtualSimulation`:
+  interleaved virtual/scratch memory and a verified constant-overhead
+  simulation of arbitrary programs.
+- `RamArenaToNativeCompiler` and its simulation convert native
+  length-prefixed input into the structural arena seen by a virtual program.
+  `RamNativeToArenaCompiler` and its simulation perform the reverse
+  conversion, buffering the native payloads in protected scratch cells.
+- `RamPolynomialComparison.bitPolynomialTime_iff_ramPolytime` now proves the
+  general class equivalence. Each implication selects a new word polynomial
+  and a new time polynomial independently. No degree equality, degree
+  preservation, or common-degree witness is stated or used.
+
+Final local validation passes. The aggregate proof build completed all 1,258
+jobs; `bash scripts/check-certified.sh` passed its 814-job closed-derivation
+suite and 1,247-job RAM prerequisite build. Independent Lax replay then
+kernel-checked and inspected 12 concepts and 18 proofs in 3m21s. The final
+equivalence proof's guarded audit reports only `propext`, `Classical.choice`,
+and `Quot.sound`; it does not assume its own concept statement. The two
+machine translations establish exact output preservation and the bounds
+`18*t+26` (native to arena) and `66*t+6*B+81` (arena to native), where `B` is
+binary input size. Thus every nonconstant time degree is preserved, while a
+constant arena-time witness may become linear. Both width witnesses are
+translated as `Q+7`; no same-degree claim is part of the equivalence. The
+constant seven-bit reserve supplies all fixed address and arena-root margins.
+
+The explanatory PDF has been regenerated and both pages visually inspected.
+The refreshed local preview lists 12 concepts and 18 proofs, marks
+`RamPolynomialComparison` proved, and links the equivalence proof with no
+outstanding assumptions. The implementation is ready for its next public
+draft revision. Lax53 and `Archive.zip` remain untouched.
+`RAM_EQUIVALENCE_PLAN.md` is retained as the implementation record rather than
+as an open-work checklist.
+
+The explanatory comparison is also available as
+[`docs/ram-polynomial-time-comparison.pdf`](docs/ram-polynomial-time-comparison.pdf)
+with editable LaTeX alongside it. It includes input magnitude in the comparison
+table, explains capacity versus bit width, and gives the separating example.
+The opening definitions of `n`, `m`, `B`, and `inputMagnitude` are displayed
+on four aligned lines. The two-page PDF compiled successfully; both original
+pages and the revised first-page layout were visually inspected.
+It is supporting documentation, not a submitted paper or a Lean proof.
 
 ## Implemented
 
@@ -9,14 +130,15 @@ For a short explanation and usage example, see [README.md](README.md).
 The guide presents formulas, finite relational structures, trees, and automata
 as examples of the general framework, rather than centering one application.
 
-The mathematical surface is `StructuralPresentation`, `StructuralCombinators`,
+The original mathematical surface is `StructuralPresentation`, `StructuralCombinators`,
 and `WordArena`, with `FormulaExample` as a separate illustrative concept.
 It encodes the propositional formula `p₀ ∧ ¬p₁` and constructs its exact word input.
 Three additional modules are explicitly labeled infrastructure:
 `CertifiedDerivation` is the small field-agreement API (no elaborator code),
 `CertifiedDerivationElab` implements the closed command, and
 `StructuralDerivation` provides unrestricted low-level folds. Lax currently
-counts all seven as concept modules; no unsupported hidden-helper category is
+counts those seven as concept modules; the local extension adds three more.
+No unsupported hidden-helper category is
 assumed. `FieldEncoding` is not a no-advice certificate; `structuralLaw%` is removed.
 
 `CertifiedDerivationElab` supplies `derive_certified_encoding`, generating the encoder,
@@ -73,7 +195,10 @@ finite family. Compiler/runtime refinements belong to Lax-53, not Lax-58.
 
 Public Git publication is complete at https://github.com/szymtor/lax58.
 `origin` is configured and `main` tracks `origin/main`.
-Lax submission and registration remain paused. The manifest lists Jan Dreier,
+Lax draft submission succeeded for commit `53278a48b0605bde8cfc9510066ee797d085a6f1`:
+https://laxarchive.org/lax-58/. Archive workflow `33964638553` rebuilt and
+published the draft successfully. Registration has not been requested.
+The manifest lists Jan Dreier,
 Szymon Toruńczyk, and ChatGPT (5.6 and 6).
 
 Keep this boundary narrow; extend the approved grammar only for a concrete
@@ -81,6 +206,7 @@ client need with positive and negative tests. Follow [WORKFLOW.md](WORKFLOW.md).
 Lax-53 archive validation is blocked by archive source resolution, not by a
 failed Lax-58 replay. Do not publish to bypass it. Preserve `Archive.zip` and
 all unrelated dirty changes. `Archive.zip` and generated build artifacts are
-excluded from the publication commit. No dependency pins were changed.
+excluded from the publication commit. The local extension adds the Lax13 pin
+noted above; existing dependency pins were not changed.
 
 History: [SESSION_HISTORY.md](SESSION_HISTORY.md).
