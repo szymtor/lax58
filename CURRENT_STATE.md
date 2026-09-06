@@ -1,8 +1,8 @@
 # Lax-58 current state
 
-Updated: 2026-09-06. Public draft/source remain at `53278a4` on
-https://github.com/szymtor/lax58 (`main`). The RAM-complexity extension below
-is local and uncommitted; no new submission or registration has been made.
+Updated: 2026-09-06. The completed RAM-complexity extension is public at
+`8631937` on https://github.com/szymtor/lax58 (`main`) and in the Lax-58 draft
+at https://laxarchive.org/lax-58/. Registration has not been requested.
 
 ## Local RAM-complexity extension
 
@@ -110,8 +110,8 @@ constant seven-bit reserve supplies all fixed address and arena-root margins.
 The explanatory PDF has been regenerated and both pages visually inspected.
 The refreshed local preview lists 12 concepts and 18 proofs, marks
 `RamPolynomialComparison` proved, and links the equivalence proof with no
-outstanding assumptions. The implementation is ready for its next public
-draft revision. Lax53 and `Archive.zip` remain untouched.
+outstanding assumptions. The implementation is published in the current
+public draft revision. Lax53 and `Archive.zip` remain untouched.
 `RAM_EQUIVALENCE_PLAN.md` is retained as the implementation record rather than
 as an open-work checklist.
 
@@ -195,8 +195,9 @@ finite family. Compiler/runtime refinements belong to Lax-53, not Lax-58.
 
 Public Git publication is complete at https://github.com/szymtor/lax58.
 `origin` is configured and `main` tracks `origin/main`.
-Lax draft submission succeeded for commit `53278a48b0605bde8cfc9510066ee797d085a6f1`:
-https://laxarchive.org/lax-58/. Archive workflow `33964638553` rebuilt and
+Lax draft submission succeeded for commit
+`86319376d4ce21dfdfa796713e06f18c575de972`:
+https://laxarchive.org/lax-58/. Archive workflow `34054472817` rebuilt and
 published the draft successfully. Registration has not been requested.
 The manifest lists Jan Dreier,
 Szymon Toruńczyk, and ChatGPT (5.6 and 6).

@@ -366,3 +366,19 @@ autonomously.
 - Updated README and regenerated the two-page explanatory PDF with current
   proof status; final LaTeX log is clean. Recorded the remaining streaming
   adapter/compiler design in `RAM_EQUIVALENCE_PLAN.md`.
+
+## 2026-09-06 completed RAM equivalence and publication
+
+- Implemented both safe tape compilers over interleaved virtual/scratch RAM
+  memory and proved arbitrary-run, halt, exact-output, and resource transfer.
+  The native-to-arena bound is `18*t+26`; arena-to-native is
+  `66*t+6*n+81`, with constant word-width slack.
+- Proved `bitPolynomialTime_iff_ramPolytime`. The class-level witnesses use
+  `18*T+26` and `66*T+6*X+81`; degrees are not required to match, and the
+  second translation can raise a constant time bound to linear.
+- Aggregate Lean build, guarded regression suite, independent kernel replay,
+  and statement inspection passed. The preview contains 12 concepts and 18
+  proofs and reports no outstanding assumptions for the equivalence.
+- Published commit `86319376d4ce21dfdfa796713e06f18c575de972` to
+  `szymtor/lax58` and submitted it as the current Lax-58 draft through archive
+  workflow `34054472817`. The public page was checked against that commit.
