@@ -1,0 +1,25 @@
+name = "Lax560851"
+defaultTargets = ["Lax560851"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "db584cd6d46c92f209a44c0f1c829460d327499d"
+
+[[lean_lib]]
+name = "Lax560851"
+
+[[require]]
+name = "Lax865980"
+git = "https://github.com/lax-archive/lax-submissions"
+rev = "0aa87e1f6e6add4abe4f4e0aff8fe4a28950b2ea"
+subDir = "word-ram-v4-33/concepts"
+
+[[require]]
+name = "Lax759944"
+git = "https://github.com/szymtor/RAM-TM"
+rev = "6fe5a3d94f6c2da46cc2c5ab98cd36997b130737"
+subDir = "concepts"

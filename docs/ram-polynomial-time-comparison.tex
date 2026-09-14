@@ -1,0 +1,149 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=21mm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\hypersetup{pdftitle={Two notions of polynomial time on the word-RAM},
+  pdfsubject={Lax759944, Lax560851, input magnitude, and word capacity}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\bits}{\operatorname{bitSize}}
+\title{Two notions of polynomial time on the word-RAM}
+\author{}
+\date{Lax759944 and the current Lax560851 example --- 6 September 2026}
+
+\begin{document}
+\begin{center}
+  {\Large\bfseries Two notions of polynomial time on the word-RAM}\par
+  {\small Lax759944 and the current Lax560851 example\enspace\textbullet\enspace 6 September 2026}
+\end{center}
+
+The definitions differ in both their input-size measure and their required
+word-width threshold. This note compares Lax759944's \code{RamPolytime} with
+\code{PolynomialTime} in Lax560851's \code{RamComplexityExample}, not with the
+unrestricted two-resource predicate \code{RamComputableWithin}.
+
+For a list $x$ of natural numbers, use the following quantities:
+\[
+\begin{aligned}
+  n &= \text{number of entries in }x,\\[3pt]
+  m &= \text{largest entry in }x\text{ (zero for the empty list)},\\[3pt]
+  B &= \bits(x)=\text{length of Lax759944's binary encoding},\\[3pt]
+  M &= \operatorname{inputMagnitude}(x)=2n+m+2.
+\end{aligned}
+\]
+The binary encoding has one separator per entry, followed by that entry's
+binary digits. Thus $B\ge n$. For example, $[2^{1000}]$ has $n=1$ but $B=1002$.
+
+\section*{1. Definitions and units}
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.16}
+\begin{tabularx}{\textwidth}{@{}p{0.20\textwidth}YY@{}}
+\toprule
+ & \textbf{Lax759944: RamPolytime} & \textbf{Lax560851: current PolynomialTime example} \\
+\midrule
+Time measure & Binary input size $B$. & Number of list entries $n$. \\
+Time allowance & $P(B)$ for a polynomial $P$. & $A(n+1)^d$ for constants $A,d\in\mathbb N$. \\
+Word requirement & $w\ge Q(B)$, where $Q$ is a polynomial. The bound is in \emph{bits}. & $CM\le 2^w$, plus payload and address fit, for a constant $C$. The bound is in \emph{numerical capacity}. \\
+Input magnitude $M$ & Not used as the size measure; size is the binary encoding length $B$. & $M=S+m+1$: structural node count $S$, plus largest natural payload $m$, plus one. Here $S=2n+1$, so $M=2n+m+2$. This is neither bit length nor memory usage. \\
+Physical input & The native list with its length prepended: $n::x$. & The certified structural arena: a root word and three words per structural node. \\
+Output compared here & The singleton list $[f(x)]$. & The same singleton list $[f(x)]$, because $f$ returns a natural number. \\
+Uniformity & One program, working at every sufficiently large width. & The same quantifier discipline. \\
+\bottomrule
+\end{tabularx}
+\endgroup
+
+Neither definition imposes an upper limit on the actual word width $w$.
+Each guarantees a run at \emph{every} width above its sufficient threshold.
+The question is how small that threshold must be, not how large the machine
+is allowed to be.
+
+Lax759944 requires the native input and exact output to fit at width $Q(B)$,
+and then requires a run of at most $P(B)$ instructions for every $w\ge Q(B)$.
+For example, the sufficient width could be $B^2$ bits, with numerical
+capacity $2^{B^2}$.
+
+For a list of naturals, Lax560851's three width premises are exactly
+\[
+  m<2^w,\qquad 6n+3\le 2^w,\qquad C(2n+m+2)\le 2^w.
+\]
+The middle condition addresses the arena's $3S=6n+3$ memory words.
+For fixed $C$, all three conditions hold starting at a width of order
+$\log(n+m+2)$. For bounded payloads, this is $O(\log n)$ bits.
+
+\newpage
+\section*{2. Why input magnitude contains $m$, not $\log m$}
+
+A $w$-bit word represents integers from $0$ through $2^w-1$. Storing the
+value $m$ therefore requires $m<2^w$, or about $\log_2(m+1)$ bits. The
+logarithm appears when solving for the \emph{width}; it does not belong on
+the capacity side of the inequality.
+
+Accordingly, $C(2n+m+2)\le 2^w$ already gives logarithmic dependence of
+the required width on $m$. Replacing $m$ by $\log m$ on the left would mix
+the bit length of a value with the numerical range needed to represent it.
+The separate payload-fit premise would still be necessary. Input magnitude
+is a convenient combined scale for address range and payload values, not a
+claim that either the storage or the number of bits is proportional to $m$.
+
+\section*{3. A function separating the definitions}
+
+Consider
+\[
+  f(x)=2^{\operatorname{length}(x)}.
+\]
+For Lax759944, use the output adapter $x\mapsto[f(x)]$ to match the natural-number
+output of the Lax560851 example. The value $2^n$ needs $n+1$ bits, even though its
+numerical value is exponential in $n$.
+
+\textbf{Why Lax759944 accommodates it.}
+The physical input starts with $n$. A fixed RAM program reads this prefix,
+sets a register to $1$, shifts it left by $n$ bits, writes the result, and
+halts. It need not inspect the remaining input entries. Left shift is an
+instruction in the underlying RAM model, so the instruction count is constant.
+Since $n\le B$, the polynomial sufficient width $Q(B)=B+2$ accommodates
+the input entries, the length prefix, and the output. The program works at
+every larger width as well.
+
+\textbf{Why the current Lax560851 example excludes it.}
+Let $x$ consist of $n$ zeros. Then $m=0$, $B=n$, and $M=2n+2$.
+For any proposed constant $C$, choose the least $w$ for which
+\[
+  2^w\ge \max\{6n+3,\ C(2n+2)\}.
+\]
+This width satisfies all three Lax560851 premises and is $O(\log n)$.
+Nevertheless, its required one-word output $2^n$ fits only if $w\ge n+1$.
+For sufficiently large $n$, these conditions are incompatible. Increasing
+the time coefficient or degree cannot fix an output that does not fit in a
+word. Returning several words would change the specified output encoding.
+
+For illustration, take $C=10$ and $n=1000$: the premises hold at $w=15$,
+because $2^{15}=32768\ge20020$. But the output requires $1001$ bits.
+For any other fixed $C$, a sufficiently large $n$ produces the same obstruction.
+
+\section*{4. Consequence and possible alignment}
+
+The definitions are not equivalent, even on zero lists where $B=n$. The
+general Lax560851 predicate is flexible enough to use time bound $P(B)$ and
+capacity bound $2^{Q(B)}$; its capacity premise then becomes $Q(B)\le w$.
+The new \code{BitPolynomialTime} definition makes this alignment while
+keeping arena input. For natural-number outputs, its equivalence with Lax759944 is
+now proved by verified translations between arena and native length-prefixed
+input tapes. Each direction chooses its own polynomial bounds; their degrees
+are not required to agree. Concretely, arena-to-native conversion sends a time
+bound $T(B)$ to $66T(B)+6B+81$, whereas native-to-arena conversion sends it to
+$18T(B)+26$. Both send a sufficient-width bound $Q(B)$ to $Q(B)+7$. Therefore
+all nonconstant time degrees are preserved, but a constant arena-time bound can
+become linear because the current adapter performs linear startup work.
+
+\small
+\textit{Status.} Both the separation and the general equivalence with Lax759944
+are kernel-checked. See \code{Lax759944.RamPolytime} and
+\code{Lax560851.RamPolynomialComparison} for the source definitions.
+\end{document}
