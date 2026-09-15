@@ -382,3 +382,10 @@ autonomously.
 - Published commit `86319376d4ce21dfdfa796713e06f18c575de972` to
   `szymtor/lax58` and submitted it as the current Lax-58 draft through archive
   workflow `34054472817`. The public page was checked against that commit.
+
+## Lean 4.33 migration, 2026-09-15
+
+Prepared independent lax-560851 from original lax-58 published sources.
+Full build, certification regression suite, and independent replay passed.
+12 concepts, 18 annotated proofs, no extra assumptions. Four proof-line
+compatibility edits; concepts unchanged apart from namespaces. Publication next.

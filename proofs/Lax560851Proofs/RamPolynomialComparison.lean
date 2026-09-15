@@ -120,7 +120,7 @@ theorem bitPolynomialTime_iff_ramPolytime (f : List Nat → Nat) :
       · simp [nativeTime]
         have hbits := Lax560851Proofs.RamExponentialExample.length_le_bitSize xs
         omega
-      · simpa [hsourceWidth] using hphysicalRun
+      · simpa [hsourceWidth] using! hphysicalRun
   · intro hnative
     rcases hnative with ⟨program, wordBits, time, hprogram⟩
     let arenaWordBits := wordBits + Polynomial.C 7

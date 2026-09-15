@@ -21,5 +21,5 @@ subDir = "word-ram-v4-33/concepts"
 [[require]]
 name = "Lax759944"
 git = "https://github.com/szymtor/RAM-TM"
-rev = "6fe5a3d94f6c2da46cc2c5ab98cd36997b130737"
+rev = "13530db8ae9e82025c8874656ae54ccfcecba566"
 subDir = "concepts"

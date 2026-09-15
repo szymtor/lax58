@@ -2036,7 +2036,7 @@ theorem run_read_success {v : Nat} {program : Program} {source : State}
           rcases run_read_natural_tag_nonempty hcapacity hfetch hstrict hdrop
               hscratch with ⟨nextScratch, hnext, hrun⟩
           exact ⟨18, nextScratch, by omega, by
-            simpa only [List.append_assoc] using hnext, by
+            simpa only [List.append_assoc] using! hnext, by
             simpa [naturalTriples, List.append_assoc] using hrun⟩
   | naturalValue consumed head tail scratch hconsumed hdrop hscratch =>
       injection hinput with hvalueEq hrestEq

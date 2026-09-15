@@ -46,7 +46,7 @@ theorem run_eq_execute (w : Nat) (p code : Program) (s : State)
   | nil => rfl
   | cons i code ih =>
     have hfirst : p[s.pc]? = some i := by simpa using hfetch 0 (by simp)
-    simp only [run, step, hfirst, Option.bind_some, execute]
+    simp only [List.length_cons, run, step, hfirst, Option.bind_some, execute]
     cases heffect : i.effect w s with
     | none => rfl
     | some next =>
@@ -137,7 +137,7 @@ theorem set_odd (v : Nat) (memory scratch : Nat → Nat) (address value : Nat)
       merge memory (put scratch (address / 2) (value % 2 ^ (v + 1))) := by
   have hindex : address / 2 < 2 ^ v := by rw [Nat.pow_succ] at hbound; omega
   have heq : 2 * (address / 2) + 1 = address := by omega
-  simpa only [Nat.mod_eq_of_lt hindex, heq, put] using
+  simpa only [Nat.mod_eq_of_lt hindex, heq, put] using!
     set_scratch v memory scratch (address / 2) value
 
 theorem setRegister_execute (v pc target value : Nat)

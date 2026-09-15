@@ -1,13 +1,23 @@
 # Lean 4.33 draft migration
 
-Original draft: lax-58. New local draft: lax-560851.
-User authorized a separate draft with a link to the original, without supersedes.
-Sources are copied from the original published commit; namespaces, toolchain,
-mathlib and dependency names have been updated. Dependency commit pins for
-other new drafts are pending their validation and publication. No Lean 4.33
-validation has passed yet. No archive submission or registration performed.
+Original draft: lax-58. New draft: lax-560851; branch lean-4.33.
+Independent draft linked to the original, without supersedes.
 
-Next: build, fix compatibility errors, validate/replay and submit in dependency order.
+Full proof build passed (1278 jobs). bash scripts/check-certified.sh passed,
+including positive and negative encoding/elaborator tests, polynomial comparison,
+virtual compiler checks, and background-only axiom audits.
+Full Lax validation/replay passed in 3m06s (2m24s replay): 12 concepts and
+18 annotated proofs; all assumption lists empty. Concept Lean sources remain
+unchanged after namespace renaming. Four proof-line compatibility changes
+make list-length simplification explicit and restore simpa matching transparency.
+The 42 inherited unused helpers are intentionally retained for downstream use,
+including the tree-automata draft. RAM/TM dependency is pinned to published
+Lean 4.33 commit 13530db8ae9e82025c8874656ae54ccfcecba566.
+
+Evidence: ../migration-tools/canonical-proof-build.log,
+canonical-regression.log, canonical-validation.log.
+Next: push and submit this validated independent draft, then update the
+new tree-automata draft to the published commit. No registration performed.
 
 ## Historical record from the original (not validation of this port)
 
