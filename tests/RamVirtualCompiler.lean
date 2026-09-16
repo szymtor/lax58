@@ -3,7 +3,7 @@ import Lax560851Proofs.RamNativeToArenaCompiler
 import Lax560851.StructuralCombinators
 import Lax560851.WordArena
 
-open Lax865980.Ram Lax560851Proofs.RamVirtualCompiler
+open Lax759944Proofs.Legacy.Ram Lax560851Proofs.RamVirtualCompiler
 open Lax560851.StructuralCombinators Lax560851.WordArena
 
 -- Executable regression tests, not substitutes for the general simulation

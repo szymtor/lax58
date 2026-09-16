@@ -14,18 +14,19 @@
 \newcommand{\bits}{\operatorname{bitSize}}
 \title{Two notions of polynomial time on the word-RAM}
 \author{}
-\date{Lax759944 and the current Lax560851 example --- 6 September 2026}
+\date{Lax759944 and the current Lax560851 example --- 16 September 2026}
 
 \begin{document}
 \begin{center}
   {\Large\bfseries Two notions of polynomial time on the word-RAM}\par
-  {\small Lax759944 and the current Lax560851 example\enspace\textbullet\enspace 6 September 2026}
+  {\small Lax759944 and the current Lax560851 example\enspace\textbullet\enspace 16 September 2026}
 \end{center}
 
-The definitions differ in both their input-size measure and their required
-word-width threshold. This note compares Lax759944's \code{RamPolytime} with
-\code{PolynomialTime} in Lax560851's \code{RamComplexityExample}, not with the
-unrestricted two-resource predicate \code{RamComputableWithin}.
+The definitions differ in their input-size measure and required word-width
+threshold. This note compares \code{RamPolytime} in Lax759944 with Lax560851's
+\code{PolynomialTime} example. Both use Lax808846: read-only input, indexed
+and sequential access, zero initial working memory, and append-only output.
+Fetched terminal instructions count toward time.
 
 For a list $x$ of natural numbers, use the following quantities:
 \[
@@ -132,18 +133,16 @@ For any other fixed $C$, a sufficiently large $n$ produces the same obstruction.
 The definitions are not equivalent, even on zero lists where $B=n$. The
 general Lax560851 predicate is flexible enough to use time bound $P(B)$ and
 capacity bound $2^{Q(B)}$; its capacity premise then becomes $Q(B)\le w$.
-The new \code{BitPolynomialTime} definition makes this alignment while
-keeping arena input. For natural-number outputs, its equivalence with Lax759944 is
-now proved by verified translations between arena and native length-prefixed
-input tapes. Each direction chooses its own polynomial bounds; their degrees
-are not required to agree. Concretely, arena-to-native conversion sends a time
-bound $T(B)$ to $66T(B)+6B+81$, whereas native-to-arena conversion sends it to
-$18T(B)+26$. Both send a sufficient-width bound $Q(B)$ to $Q(B)+7$. Therefore
-all nonconstant time degrees are preserved, but a constant arena-time bound can
-become linear because the current adapter performs linear startup work.
+The arena-based \code{BitPolynomialTime} definition makes this alignment.
+Its equivalence with Lax759944 is proved for all Lax808846 instructions.
+The verified conversions preserve indexed input, sequential reads, length,
+EOF, and exact output, and may add linear startup time in either direction.
+They choose separate polynomial witnesses; no equality of degrees is required.
 
 \small
-\textit{Status.} Both the separation and the general equivalence with Lax759944
-are kernel-checked. See \code{Lax759944.RamPolytime} and
-\code{Lax560851.RamPolynomialComparison} for the source definitions.
+\textit{Formalization, 16 September 2026.} The output-fit invariant,
+separation theorem, seven-instruction exponential example, and general
+equivalence are checked in Lean 4.33. The equivalence uses the verified
+compiler for the complete Lax808846 instruction set, with input initialization
+and terminal instructions included in the time bounds.
 \end{document}

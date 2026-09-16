@@ -2,7 +2,7 @@ import Lax560851Proofs.RamVirtualSimulation
 
 namespace Lax560851Proofs.RamArenaToNativeCompiler
 
-open Lax865980.Ram
+open Lax759944Proofs.Legacy.Ram
 open RamVirtualCompiler
 
 def nativeLengthRegister : Nat := 13

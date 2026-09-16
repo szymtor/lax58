@@ -130,7 +130,9 @@ with both encodings explicit and inspectable. It is a low-level relative
 predicate, not itself an encoding certificate. See
 [RamComplexityExample](concepts/Lax560851/RamComplexityExample.lean) for the
 two-input and ordinary size-based examples. This layer uses the existing
-Lax865980 machine model, pinned to the same revision as Lax842588.
+[Lax808846 machine model](https://laxarchive.org/lax-808846/Lax808846.Ram.html),
+with immutable indexed input, sequential input access, and append-only output.
+Its instruction count includes a fetched final `halt` or exhausted `read`.
 
 ## Polynomial time measured in bits
 
@@ -143,21 +145,23 @@ and size measure. It instantiates `RamComputableWithinUsing` with capacity
 `2 ^ wordBits.eval (inputSize x)` and requires the input to fit at that width.
 
 The concept includes `exponentialLength xs = 2 ^ xs.length`. Its positive
-bit-polynomial proof uses six RAM instructions and sufficient width
-`bitSize xs + 4`. Its negative proof rules out the existing linear-capacity
-`TimeBounded` property for **every** time allowance, hence also rules out
+bit-polynomial proof uses seven RAM instructions, including its final `halt`,
+and sufficient width `bitSize xs + 4`. Its negative proof rules out the existing
+linear-capacity `TimeBounded` property for **every** time allowance, hence also rules out
 `PolynomialTime`. Both proofs use only Lean's permitted background axioms.
 
-The general equivalence with Lax759944's native, length-prefixed input convention
-is kernel-checked. Two verified RAM compilers translate the input tapes and
-simulate arbitrary programs with constant-factor instruction overhead,
-constant word-width slack, and linear startup work. The implications choose
-independent polynomial witnesses; their degrees need not agree. More exactly,
-arena-to-native translation maps time `T` to `66*T + 6*X + 81`, while
-native-to-arena maps it to `18*T + 26`; both map sufficient width `Q` to
-`Q + 7`. Hence degrees at least one are preserved, but a constant arena-time
-bound can become linear under the current adapter. See
-[RamPolynomialComparison](concepts/Lax560851/RamPolynomialComparison.lean).
+The general equivalence with Lax759944's explicit, length-prefixed input
+convention now covers every Lax808846 instruction. A verified compiler buffers
+the immutable input tape and preserves indexed access, sequential reads, input
+length, EOF branches, and exact output. The earlier sequential-input machine
+and tape adapters remain internal checked proof helpers.
+
+For source time polynomial `T` and sufficient-width polynomial `Q`, the
+composed arena-to-native witnesses are `1188*T + 2382*X + 3382` and `Q + 14`.
+The native-to-arena witnesses are `324*T + 108*X + 603` and `Q + 14`.
+Both directions can add linear startup time; the class theorem does not
+require equal polynomial degrees. See [CURRENT_STATE.md](CURRENT_STATE.md)
+for the completed checks and remaining archive validation.
 
 Run `bash scripts/check-certified.sh` for the positive and negative derivation
 tests. See [CURRENT_STATE.md](CURRENT_STATE.md) for validation status and

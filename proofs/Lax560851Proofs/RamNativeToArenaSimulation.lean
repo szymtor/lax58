@@ -7,7 +7,7 @@ namespace Lax560851Proofs.RamNativeToArenaSimulation
 set_option linter.unusedSimpArgs false
 set_option linter.unusedTactic false
 
-open Lax865980.Ram
+open Lax759944Proofs.Legacy.Ram
 open RamVirtualMemory RamVirtualMacros
 open RamNativeToArenaCompiler RamListArena
 

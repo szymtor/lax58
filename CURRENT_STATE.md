@@ -1,4 +1,80 @@
-# Lean 4.33 draft migration
+# Dedicated-input/output RAM rebase
+
+Updated: 2026-09-16. The local Lax560851 concepts and public proof endpoint now
+use the complete Lax808846 machine at archive commit
+`9394e531cc51cb67a0214bca3f9264dfe97ba5c7`. Its immutable input tape supports
+sequential reads, indexed loads, length queries, and EOF tests; output is a
+separate append-only tape. A fetched final halt or exhausted read costs one.
+
+## Completed implementation
+
+- The output-fit invariant, separation theorem, and positive exponential
+  example use the new semantics directly. The example costs seven instructions.
+- The general arena/native polynomial-class equivalence now composes the
+  verified full-instruction buffered compiler with checked legacy tape
+  adapters and the legacy/current embedding. Its public proposition quantifies
+  the actual Lax808846 machine in both endpoints, without a compiler premise.
+- The former sequential machine and class comparison are explicit internal
+  helpers that import the vendored definitions instead of the deleted Lax865980
+  archive package. They contain no copied conclusion axioms and do not restrict
+  the new source programs.
+- Arena-to-native witnesses are `1188*T + 2382*X + 3382`, `Q + 14`;
+  native-to-arena witnesses are `324*T + 108*X + 603`, `Q + 14`.
+  Both directions may add linear startup time; no equality of degrees is used.
+- The proof root imports all 20 source modules exactly once. The regression
+  script now builds the public comparison and includes its concrete compiler
+  transfer and axiom audits. WORKFLOW, README, and the comparison note source
+  describe the current machine.
+
+## Validation and next action
+
+Full Lax validation with independent kernel replay passed on 2026-09-16
+against the published dependency pins: **12 concepts, 18 annotated proofs,
+and empty assumption lists for every proof**. The general arena/native
+comparison is present with its original public conclusion. The run took
+7m08s: concept compilation 2m16s, proof compilation 2m36s, independent replay
+2m08s, and statement inspection 7s.
+
+Both generated package manifests use the current exact archive revisions;
+neither contains the deleted RAM package or a local override of any archive
+package. All 39 recorded source/configuration hashes remained unchanged through
+validation, including the final WordArena prose corrections. The 45 warnings
+are 42 intentionally retained helper lemmas, one proof-package dependency,
+and two draft-package dependencies. No mathematical error or extra assumption
+was reported.
+
+The canonical concept dependency `Lax759944` and proof dependency
+`Lax759944Proofs` both pin the published RAM/TM commit
+`7010243df12cdda03abc5f63ec8de2c0963d4052`. Its successful archive workflow is
+[35061865356](https://github.com/lax-archive/lax/actions/runs/35061865356).
+The installed CLI calls archive refresh `lax sync`; after that command, the
+local authoritative RAM record was checked against this exact commit before
+canonical validation began. The direct Lax808846 revision remains
+`9394e531cc51cb67a0214bca3f9264dfe97ba5c7`.
+
+Earlier normal proof-root compilation passed (1316 jobs), and the full
+`check-certified.sh` script passed all eight regression files using explicit
+development overrides. Those checks cover positive/negative encoding tests,
+exact new-model theorem types, background-only axiom guards, terminal costs,
+and executable legacy adapter fixtures. The concrete proof declarations use
+only `propext`, `Classical.choice`, and `Quot.sound`.
+
+Evidence:
+`../migration-tools/canonical-808846-validation.log`,
+`../migration-tools/canonical-808846-comparison.log`,
+`../migration-tools/canonical-808846-proof-build.log`, and
+`../migration-tools/canonical-808846-certified.log`.
+The coordinating agent regenerated the final comparison PDF and visually
+inspected both pages.
+
+Next action: the coordinating agent can commit and publish the validated
+canonical working tree, then update downstream canonical dependency pins.
+Canonical rebase publication remains pending. Current canonical published
+commits and older validation logs below describe the previous machine version.
+No commit, push, publication, registration, or PDF edit was performed by this
+final-validation task.
+
+## Previous Lean 4.33 draft migration (historical)
 
 Original draft: lax-58. New draft: lax-560851; branch lean-4.33.
 Independent draft linked to the original, without supersedes.
@@ -16,8 +92,10 @@ Lean 4.33 commit 13530db8ae9e82025c8874656ae54ccfcecba566.
 
 Evidence: ../migration-tools/canonical-proof-build.log,
 canonical-regression.log, canonical-validation.log.
-Next: push and submit this validated independent draft, then update the
-new tree-automata draft to the published commit. No registration performed.
+Published: https://laxarchive.org/lax-560851/ (issue 114), commit
+091d4fe67804863dac4001f7bc1ac72d8597a7e4. Archive rebuild passed in
+5m01s and publication in 46s. Tree-automata dependencies updated to this commit.
+Next: no further work required for this draft. No registration performed.
 
 ## Historical record from the original (not validation of this port)
 

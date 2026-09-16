@@ -5,7 +5,7 @@ import Mathlib.Data.Nat.Size
 
 namespace Lax560851Proofs.RamExponentialExample
 
-open Lax865980.Ram Lax865980.RamComputes
+open Lax808846.Ram Lax808846.RamComputes
 open Lax560851.StructuralPresentation Lax560851.StructuralCombinators Lax560851.WordArena
 open Lax560851.RamComplexity Lax560851.RamPolynomialComparison
 open Lax759944.BinaryWordEncoding
@@ -50,26 +50,28 @@ def exponentialProgram : Program :=
 
 theorem exponentialProgram_runs (n w : Nat) (rest : List Nat)
     (hroot : 6 * n < 2 ^ w) (hsix : 6 < 2 ^ w) (houtput : 2 ^ n < 2 ^ w) :
-    RunsTo w exponentialProgram (6 * n :: rest) [2 ^ n] 6 := by
+    RunsTo w exponentialProgram (6 * n :: rest) [2 ^ n] 7 := by
   have hzero : 0 % 2 ^ w = 0 := Nat.zero_mod _
   have hone : 1 % 2 ^ w = 1 := Nat.mod_eq_of_lt (by omega)
   have hn : n < 2 ^ w := by omega
-  simp only [RunsTo, exponentialProgram, run, step, initState, Instr.effect,
+  refine ⟨6, ?_⟩
+  simp only [exponentialProgram, run, step, initState, Instr.effect,
     List.getElem?_cons_zero, List.getElem?_cons_succ, List.head?_cons, List.tail_cons,
     Option.bind_some, Option.map_some, setCell, hzero, hone, Nat.mod_eq_of_lt hroot,
     Nat.mod_eq_of_lt hsix]
   norm_num [Nat.mul_div_right, Nat.mul_div_left, Nat.mod_eq_of_lt hn,
-    Nat.mod_eq_of_lt houtput]
+    Nat.mod_eq_of_lt houtput, terminalCost]
 
 /--
 ---
 conclusion: Lax560851.RamPolynomialComparison.exponentialLength_bitPolynomialTime
 ---
-Six executed RAM instructions suffice. A sufficient word length is binary
-input size plus four, which fits the arena, the literal six, and the output.
+Seven executed RAM instructions, including the final halt, suffice. A sufficient
+word length is binary input size plus four, which fits the arena, the literal six,
+and the output.
 -/
 theorem exponentialLength_bitPolynomialTime : BitPolynomialTime exponentialLength := by
-  refine ⟨Polynomial.X + Polynomial.C 4, Polynomial.C 6, ?_, ?_⟩
+  refine ⟨Polynomial.X + Polynomial.C 4, Polynomial.C 7, ?_, ?_⟩
   · intro xs
     simp only [Polynomial.eval_add, Polynomial.eval_X, Polynomial.eval_C]
     have hlen := length_le_bitSize xs
@@ -97,10 +99,10 @@ theorem exponentialLength_bitPolynomialTime : BitPolynomialTime exponentialLengt
       Nat.pow_lt_pow_right (by decide) (by have := length_le_bitSize xs; omega)
     have heq : input = (encode (list nat) xs).toInput := by simpa using hinput
     subst input
-    refine ⟨6, by simp, ?_⟩
+    refine ⟨7, by simp, ?_⟩
     change RunsTo w exponentialProgram
       ((encode (list nat) xs).root :: (encode (list nat) xs).memory.toList)
-      [2 ^ xs.length] 6
+      [2 ^ xs.length] 7
     rw [natList_root]
     exact exponentialProgram_runs _ _ _ hroot hsix houtput
 

@@ -2,7 +2,7 @@ import Lax560851Proofs.RamVirtualCompiler
 
 namespace Lax560851Proofs.RamVirtualMacros
 
-open Lax865980.Ram RamVirtualMemory RamVirtualCompiler
+open Lax759944Proofs.Legacy.Ram RamVirtualMemory RamVirtualCompiler
 
 /-- Execute a straight-line instruction sequence. The later fetch lemma
 connects this fold to `Ram.run` inside the containing compiled program. -/

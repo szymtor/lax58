@@ -2,7 +2,7 @@ import Lax560851Proofs.RamVirtualMacros
 
 namespace Lax560851Proofs.RamVirtualSimulation
 
-open Lax865980.Ram
+open Lax759944Proofs.Legacy.Ram
 open RamVirtualMemory RamVirtualCompiler RamVirtualMacros
 
 def Simulates (v : Nat) (source physical : State) : Prop :=

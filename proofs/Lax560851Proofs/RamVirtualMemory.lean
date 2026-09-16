@@ -1,9 +1,9 @@
-import Lax865980.Ram
+import Lax759944Proofs.Legacy.Ram
 import Mathlib.Data.Nat.Basic
 
 namespace Lax560851Proofs.RamVirtualMemory
 
-open Lax865980.Ram
+open Lax759944Proofs.Legacy.Ram
 
 /-- A virtual RAM owns even physical addresses; an input adapter owns odd
 addresses. At physical width `v+1`, all `v`-bit virtual addresses fit. -/

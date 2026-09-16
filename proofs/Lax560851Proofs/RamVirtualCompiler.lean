@@ -3,7 +3,7 @@ import Mathlib.Data.Nat.Bitwise
 
 namespace Lax560851Proofs.RamVirtualCompiler
 
-open Lax865980.Ram RamVirtualMemory
+open Lax759944Proofs.Legacy.Ram RamVirtualMemory
 
 -- All compiler registers are odd physical cells. They never alias a
 -- simulated cell, even when the source program uses every virtual address.

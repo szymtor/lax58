@@ -146,9 +146,9 @@ example (f T W : Nat → Nat) :
 -- The explicit core has exactly the promised quantifier order and premises.
 example (f T W : Nat → Nat) :
     (RamComputableWithin f T W) ↔
-      ∃ p : Lax865980.Ram.Program, ∀ n w : Nat,
+      ∃ p : Lax808846.Ram.Program, ∀ n w : Nat,
         n < 2 ^ w → 3 ≤ 2 ^ w → W n ≤ 2 ^ w →
-        Lax865980.RamComputes.ComputesInTime w p
+        Lax808846.RamComputes.ComputesInTime w p
           {(Lax560851.WordArena.encodeRaw (.nat n)).toInput}
           (fun _ => [f n]) (fun _ => T n) := Iff.rfl
 

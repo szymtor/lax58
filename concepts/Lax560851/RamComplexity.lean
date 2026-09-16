@@ -1,4 +1,4 @@
-import Lax865980.RamComputes
+import Lax808846.RamComputes
 import Lax560851.WordArena
 
 /-!
@@ -11,8 +11,10 @@ One fixed program computes a mathematical function within explicit time and
 word-capacity bounds. It works at every word width satisfying the input-fit
 conditions and the supplied capacity threshold. The threshold is a number of
 representable values, not a number of bits. Output production is included in
-the instruction count. No computability or growth restriction on either bound
-is implicit: such restrictions belong in the theorem using this predicate.
+the instruction count, including a fetched final `halt` or exhausted `read`.
+The arena is supplied on Lax808846's immutable input array and sequential
+tape; writable memory starts at zero. No computability or growth restriction
+on either bound is implicit: such restrictions belong in the theorem using this predicate.
 
 `RamComputableWithinUsing` is relative to explicitly supplied encodings; it
 does not certify them. The `RamComputableWithin` frontend selects approved
@@ -22,7 +24,7 @@ natural and Boolean outputs use one word, and structured outputs use arenas.
 
 namespace Lax560851.RamComplexity
 
-open Lax865980.Ram Lax865980.RamComputes
+open Lax808846.Ram Lax808846.RamComputes
 open Lax560851.StructuralPresentation Lax560851.WordArena
 
 universe u v

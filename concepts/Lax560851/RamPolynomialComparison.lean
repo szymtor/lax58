@@ -19,15 +19,12 @@ output. It agrees with Lax759944's convention, whose input is instead the native
 length-prefixed sequence. The agreement requires explicit efficient encoding
 conversions; it is not a definitional identification of the two input tapes.
 
-The checked proof uses the following witness transformations, where `T` is a
-time polynomial, `Q` is a sufficient-word-length polynomial, and `X` denotes
-the binary input size. From arena input to native input it uses
-`66*T + 6*X + 81`; from native input to arena input it uses `18*T + 26`.
-Both directions use `Q + 7` for word length. Consequently, nonconstant time
-degrees are preserved, but the first translation can turn a constant bound
-into a linear one because its current adapter has linear startup. The theorem
-asserts equivalence of the existential polynomial-time classes only: it does
-not require the two witnesses, or their degrees, to match.
+The input conversions must preserve both indexed access to the original
+input and sequential reads, including EOF. Buffering an input can contribute
+linear startup time in either direction. The theorem asserts equivalence of
+the existential polynomial-time classes only: it does not require the two
+time witnesses, or their degrees, to match. Terminal instructions are charged
+according to the Lax808846 machine semantics.
 
 `RamComplexityExample.PolynomialTime` instead bounds time polynomially in
 `n` and requires correctness whenever capacity exceeds a constant times

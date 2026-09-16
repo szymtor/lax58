@@ -3,7 +3,7 @@ import Lax560851Proofs.RamListArena
 
 namespace Lax560851Proofs.RamArenaToNativeSimulation
 
-open Lax865980.Ram
+open Lax759944Proofs.Legacy.Ram
 open RamVirtualMemory RamVirtualMacros
 open RamListArena
 open RamArenaToNativeCompiler

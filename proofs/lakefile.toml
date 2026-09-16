@@ -16,8 +16,15 @@ path = "../concepts"
 [[lean_lib]]
 name = "Lax560851Proofs"
 
+
 [[require]]
-name = "Lax865980"
+name = "Lax808846"
 git = "https://github.com/lax-archive/lax-submissions"
-rev = "0aa87e1f6e6add4abe4f4e0aff8fe4a28950b2ea"
-subDir = "word-ram-v4-33/concepts"
+rev = "9394e531cc51cb67a0214bca3f9264dfe97ba5c7"
+subDir = "word-ram/concepts"
+
+[[require]]
+name = "Lax759944Proofs"
+git = "https://github.com/szymtor/RAM-TM"
+rev = "7010243df12cdda03abc5f63ec8de2c0963d4052"
+subDir = "proofs"

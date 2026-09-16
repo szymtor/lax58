@@ -389,3 +389,90 @@ Prepared independent lax-560851 from original lax-58 published sources.
 Full build, certification regression suite, and independent replay passed.
 12 concepts, 18 annotated proofs, no extra assumptions. Four proof-line
 compatibility edits; concepts unchanged apart from namespaces. Publication next.
+
+Publication confirmed at https://laxarchive.org/lax-560851/, issue 114,
+commit 091d4fe67804863dac4001f7bc1ac72d8597a7e4.
+
+## 2026-09-15 dedicated-input/output RAM rebase
+
+- Rebased the public resource predicate and comparison endpoints onto the
+  complete Lax808846 model at exact archive commit
+  `9394e531cc51cb67a0214bca3f9264dfe97ba5c7`. Dedicated immutable input supports
+  indexed access, sequential reads, length, and EOF; fetched terminal
+  instructions are charged. The arena layout and explicit native length prefix
+  are unchanged encodings.
+- Migrated output-fit and separation directly. The positive exponential example
+  now counts its halt, giving seven executed instructions.
+- Retained the former sequential arena/native compiler comparison under
+  `Lax560851Proofs.Legacy` as a checked internal lemma. Its predicates contain
+  definitions only, and it imports RAM/TM's vendored legacy machine rather than
+  the deleted archive dependency.
+- Proved class transfer through the full-instruction buffered compiler,
+  projected its generated instruction subset into the old semantics, and
+  restored the original annotated public equivalence without a compiler
+  assumption. The public theorem uses Lax808846 in both endpoints.
+- Composed bounds are `1188*T + 2382*X + 3382`, `Q + 14` from arena to native,
+  and `324*T + 108*X + 603`, `Q + 14` in the other direction. Both may add a
+  linear startup term; polynomial degrees need not match.
+- Preserved the existing presentation helper API. The proof root now imports
+  all 20 modules exactly once and retains 18 annotated conclusions. Updated
+  the regression script to build the public comparison and run concrete
+  lowering/class transfer audits; optional `LAKE_PACKAGES` makes development
+  dependency overrides explicit.
+- The concrete annotated frontend and its background-axiom guard pass Lean
+  4.33 with `autoImplicit=false`. The only axiom dependencies are `propext`,
+  `Classical.choice`, and `Quot.sound`. A transfer audit's expected message
+  wrapping was corrected; its mathematical axiom list was unchanged.
+- Updated WORKFLOW, README, current status, and the explanatory note. The
+  coordinating agent regenerated the PDF and visually inspected both pages.
+  The normal full proof-root build passed (1316 jobs), and the full certification
+  script passed all eight regression files using explicit local overrides.
+  Logs are `../migration-tools/canonical-808846-proof-build.log` and
+  `../migration-tools/canonical-808846-certified.log`. Archive replay and
+  publication await the rebased dependency pins.
+  No commit, publication, or registration was performed by this frontend task.
+
+## 2026-09-16 rebased RAM/TM release pins
+
+- Pinned canonical concepts' `Lax759944` and proofs' `Lax759944Proofs` to
+  `7010243df12cdda03abc5f63ec8de2c0963d4052`, the rebased RAM/TM release commit.
+  The direct Lax808846 pin remains
+  `9394e531cc51cb67a0214bca3f9264dfe97ba5c7`.
+- The coordinating agent confirmed RAM/TM's full independent Lax replay passed:
+  seven concepts, four annotated proofs, and empty assumption lists. Its
+  archive record update is still awaiting confirmation.
+- Canonical validation has deliberately not been started against the new pins.
+  Exact next action is to run canonical Lax validation with independent replay
+  after the coordinating agent confirms the RAM/TM archive record contains the
+  new commit. Previous local canonical build/regression evidence is unchanged.
+- No commit, push, publication, registration, or PDF edit was performed in this
+  release-pin preparation task.
+
+## 2026-09-16 final canonical validation against the published RAM
+
+- RAM/TM archive workflow
+  [35061865356](https://github.com/lax-archive/lax/actions/runs/35061865356)
+  completed successfully. Refreshed the local archive with `lax sync` (the
+  installed CLI does not recognize the older `pull-db` spelling), then verified
+  `lax-759944` records exactly commit
+  `7010243df12cdda03abc5f63ec8de2c0963d4052` from `szymtor/RAM-TM`.
+- Ran `env LEAN_NUM_THREADS=2 lax build . --replay --no-color` on the canonical
+  package. The initial sandboxed dependency clone hit a DNS restriction; the
+  approved unrestricted retry completed successfully. No proof change was
+  needed during validation.
+- Final result: 12 concepts, 18 annotated proofs, and empty assumption lists
+  for every proof, including the full-model arena/native equivalence.
+  Total time was 7m08s: concepts 2m16s, proofs 2m36s, independent kernel replay
+  2m08s, and inspection 7s. Evidence:
+  `../migration-tools/canonical-808846-validation.log`.
+- Both generated manifests were checked for the exact current RAM/TM and
+  Lax808846 revisions. Neither generated package-overrides file contains any
+  local archive-package override; the deleted RAM dependency is absent.
+  All 39 recorded source/configuration hashes were unchanged, including the
+  coordinating agent's final WordArena description corrections.
+- The 45 warnings comprise 42 intentionally retained helper lemmas, one
+  proof-package dependency, and two draft-package dependencies. There are no
+  extra assumptions or mathematical errors.
+- Updated current status to hand off the validated working tree for coordinated
+  commit/publication and downstream repinning. No commit, push, publication,
+  registration, or PDF edit was performed in this final-validation task.

@@ -14,7 +14,7 @@ children. The root address is supplied as one additional word.
 The explicit encoder determines every stored word. Density separately says
 that it adds no unreachable auxiliary blocks. The semantic representation
 relation, exact footprint, and explicit payload and address-space hypotheses
-form the public interface. The distinguished Lax-13 input is the root word
+form the public interface. The distinguished Lax808846 input is the root word
 followed by the arena words on the machine's read-only input tape. No whole-memory
 decoder, uniqueness of arbitrary physical layouts, mutation semantics, or
 operation-cost model is imposed.
@@ -43,7 +43,7 @@ def memoryWords (I : WordImage) : Nat := I.memory.size
 /-- Total supplied words, including the separately supplied root. -/
 def totalWords (I : WordImage) : Nat := I.memoryWords + 1
 
-/-- The distinguished Lax-13 input tape: root, followed by all arena words. -/
+/-- The distinguished Lax808846 input tape: root, followed by all arena words. -/
 def toInput (I : WordImage) : List Nat := I.root :: I.memory.toList
 
 /-- The memory array fits in the address space of `w`-bit words. -/

@@ -2,7 +2,7 @@ import Lax560851.RamComplexity
 
 namespace Lax560851Proofs.RamOutputBounds
 
-open Lax865980.Ram Lax865980.RamComputes
+open Lax808846.Ram Lax808846.RamComputes
 open Lax560851.StructuralPresentation Lax560851.WordArena Lax560851.RamComplexity
 
 /-- Every word written by a RAM fits, regardless of the input, memory,
@@ -48,8 +48,8 @@ theorem run_output_fits (w : Nat) (p : Program) (t : Nat) (s s' : State)
 
 theorem runsTo_output_fits {w : Nat} {p : Program} {x y : List Nat} {t : Nat}
     (h : RunsTo w p x y t) : ∀ a ∈ y, a < 2 ^ w := by
-  obtain ⟨s, hrun, _, rfl⟩ := h
-  exact run_output_fits w p t (initState x) s (by simp [initState]) hrun
+  obtain ⟨k, s, hrun, _, rfl, _⟩ := h
+  exact run_output_fits w p k (initState x) s (by simp [initState]) hrun
 
 /-- A capacity lower bound on exact natural outputs. This applies even
 without any restriction on the allowed running time. -/

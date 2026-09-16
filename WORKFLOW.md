@@ -2,8 +2,9 @@
 
 Read [CURRENT_STATE.md](CURRENT_STATE.md) first. This package owns structural
 content provenance, the distinguished immutable arena, and an encoding-aware
-resource predicate over the existing Lax865980 RAM model. It does not own automata,
-mutable compiler storage, or a new machine cost model.
+resource predicate over the Lax808846 RAM model, with its immutable input tape,
+sequential input cursor, indexed input access, and separate output tape.
+The checked legacy machine and compilers are internal proof helpers.
 
 Keep agreement definitions in `CertifiedDerivation` free of elaborator code;
 constructor inspection and the private registry belong to

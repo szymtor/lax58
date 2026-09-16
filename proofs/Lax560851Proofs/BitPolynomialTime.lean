@@ -2,7 +2,7 @@ import Lax560851.BitPolynomialTime
 
 namespace Lax560851Proofs.BitPolynomialTime
 
-open Lax865980.Ram Lax865980.RamComputes
+open Lax808846.Ram Lax808846.RamComputes
 open Lax560851.StructuralPresentation Lax560851.WordArena Lax560851.RamComplexity
 open Lax560851.BitPolynomialTime
 
