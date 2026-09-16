@@ -476,3 +476,16 @@ commit 091d4fe67804863dac4001f7bc1ac72d8597a7e4.
 - Updated current status to hand off the validated working tree for coordinated
   commit/publication and downstream repinning. No commit, push, publication,
   registration, or PDF edit was performed in this final-validation task.
+# 2026-09-16 publication policy and final local scope
+
+- Committed and pushed the validated implementation as
+  `8ec635640f3fd05271fa5cb7b1d3ae9e59400d7b`.
+- Archive workflow `35064198245` rejected its RAM/TM draft dependencies at
+  the static gate. The current archive policy requires registered dependencies
+  for publication, while local builds may warn about them.
+- The user explicitly chose to keep the dependencies as drafts and finish
+  local validation. No registration or further archive publication is
+  authorized. The corrected sources and all local validation evidence are
+  retained; the existing archive record remains unchanged.
+- This status update changes no Lean source, dependency pin, or PDF. Tree
+  development continues to pin the validated implementation commit above.

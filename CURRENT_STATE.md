@@ -67,12 +67,20 @@ Evidence:
 The coordinating agent regenerated the final comparison PDF and visually
 inspected both pages.
 
-Next action: the coordinating agent can commit and publish the validated
-canonical working tree, then update downstream canonical dependency pins.
-Canonical rebase publication remains pending. Current canonical published
-commits and older validation logs below describe the previous machine version.
-No commit, push, publication, registration, or PDF edit was performed by this
-final-validation task.
+The validated implementation is committed and pushed as
+`8ec635640f3fd05271fa5cb7b1d3ae9e59400d7b`; tree dependencies pin that revision.
+The archive rejected its draft update in
+[workflow 35064198245](https://github.com/lax-archive/lax/actions/runs/35064198245)
+because publication now requires registered dependencies. Local validation
+permits draft dependencies with warnings, so its successful checks remain
+valid local evidence.
+
+On 2026-09-16 the user explicitly chose to keep the dependencies as drafts
+and finish local validation. No registration or further archive publication
+is authorized. This rebase is complete locally; the public canonical archive
+record remains at `091d4fe67804863dac4001f7bc1ac72d8597a7e4` and describes the
+previous machine. Later status-only commits do not change the validated Lean
+sources or the downstream implementation pin.
 
 ## Previous Lean 4.33 draft migration (historical)
 
