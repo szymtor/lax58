@@ -1,3 +1,21 @@
+# Finalization authorized — in progress (2026-09-16)
+
+The user explicitly requested submission, consistent GPT author credits, and
+final registration of the current submissions. This supersedes the earlier
+keep-draft restriction and repository instructions against registration for
+this release. Preserve the model/version suffixes in the author names.
+
+Publish and register in dependency order, updating downstream pins to each
+accepted final source commit. Register only after verifying the Archive has
+accepted that exact commit and the intended metadata and proof obligations.
+The local tree preview was reviewed before this authorization.
+
+Next: complete validation, publish the updated draft, verify it, and register.
+The records below describe earlier checkpoints; none implies this release is
+already published or registered.
+
+## Previous status
+
 # Dedicated-input/output RAM rebase
 
 Updated: 2026-09-16. The local Lax560851 concepts and public proof endpoint now
