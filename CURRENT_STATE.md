@@ -1,20 +1,26 @@
-# Finalization authorized — in progress (2026-09-16)
+# Registered final submission — lax-560851
 
-The user explicitly requested submission, consistent GPT author credits, and
-final registration of the current submissions. This supersedes the earlier
-keep-draft restriction and repository instructions against registration for
-this release. Preserve the model/version suffixes in the author names.
+Updated 2026-09-16. The user authorized final publication of the six current
+Lean 4.33 submissions and normalization of AI author credits to GPT, retaining
+version numbers. This supersedes the earlier keep-draft restrictions.
 
-Publish and register in dependency order, updating downstream pins to each
-accepted final source commit. Register only after verifying the Archive has
-accepted that exact commit and the intended metadata and proof obligations.
-The local tree preview was reviewed before this authorization.
+- Registered and citable: https://laxarchive.org/lax-560851/
+- Frozen source: `2748fdc0afc0b4f729b7775ca6475ba08129418a` on `lean-4.33`.
+- All dependency pins identify accepted, registered source revisions.
+- Full local exact-pin Lax compilation, independent kernel replay, and statement
+  inspection passed: 12 concepts and 18 proofs; every proof has no non-background assumptions.
+- The Archive independently rebuilt, replayed, inspected, and accepted this
+  exact source before registration.
+- The registered record was verified against the exact source/capture provenance,
+  GPT author credits, all concept source text, proof counts and complete proof
+  closure, and registered dependency pins.
+- Evidence: `../migration-tools/finalize-second-tier-verification.log` and
+  `../migration-tools/finalize-canonical-build.log`, `-submit.log`, `-register.log`.
 
-Next: complete validation, publish the updated draft, verify it, and register.
-The records below describe earlier checkpoints; none implies this release is
-already published or registered.
+No further publication is needed. Downstream submissions must pin the frozen
+source above. Local status documentation may advance after that immutable commit.
 
-## Previous status
+## Earlier history
 
 # Dedicated-input/output RAM rebase
 

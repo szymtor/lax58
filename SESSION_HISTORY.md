@@ -489,3 +489,24 @@ commit 091d4fe67804863dac4001f7bc1ac72d8597a7e4.
   retained; the existing archive record remains unchanged.
 - This status update changes no Lean source, dependency pin, or PDF. Tree
   development continues to pin the validated implementation commit above.
+
+## 2026-09-16 — Final registration
+
+The user explicitly authorized submission, GPT author normalization, and final
+registration of the six current Lean 4.33 submissions; the six older drafts are
+excluded. This release supersedes the keep-draft decision and the repository's
+registration restriction under the user's direct instruction.
+
+Canonical author credit is `GPT (5.6 and 6)`. Both RAM/Turing pins now identify
+registered commit `134e398cef46599371df99f10c9007bc34ba3868`. The source release
+`2748fdc0afc0b4f729b7775ca6475ba08129418a` passed a complete local Lax build/replay
+in 5m53s (4m27s replay), then Archive workflow 35081022294 passed (5m01s
+validation, 49s publication). It contains 12 concepts and 18 annotated proofs,
+all without non-background assumptions. Registration workflow 35084920904
+succeeded. The refreshed registered record passed exact-source, authors,
+concept text, dependency pin, and proof-closure verification. No theorem was
+changed during finalization; the previously validated Lax808846 correction is
+now the accepted and registered Archive source.
+
+The registered version is immutable. Future changes require a new submission;
+subsequent local documentation commits do not change the frozen source.
